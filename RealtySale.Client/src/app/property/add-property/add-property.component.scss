@@ -1,0 +1,20 @@
+.form-btn-block {
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-btn-block button {
+  width: 48%;
+}
+
+.photo-control {
+  min-height: 300px;
+  vertical-align: middle;
+  text-align: center;
+  border: 1px dashed #0000ff;
+  margin: 5px;
+}
+
+.btn-group > label[ng-reflect-btn-radio]:not(:first-child) {
+  margin-left: 10px;
+}

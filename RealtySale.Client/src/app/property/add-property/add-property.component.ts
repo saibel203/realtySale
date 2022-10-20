@@ -25,6 +25,7 @@ export class AddPropertyComponent implements OnInit {
   whereCanMove: Array<string> = ['East', 'West', 'South', 'North'];
   agreement: Array<string> = ['Yes', 'No'];
   property = new Property();
+  cityList?: any[];
 
 
   propertyView: IPropertyBase = {
@@ -186,6 +187,9 @@ export class AddPropertyComponent implements OnInit {
     private housingService: HousingService, private router: Router) { }
 
   ngOnInit() {
+    this.housingService.getAllCities().subscribe(
+      (data) => this.cityList = data
+    );
     this.CreateAddPropertyForm();
   }
 

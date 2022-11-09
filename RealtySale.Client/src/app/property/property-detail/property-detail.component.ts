@@ -11,12 +11,7 @@ import { HousingService } from 'src/app/services/housing.service';
 export class PropertyDetailComponent implements OnInit {
 
   property? = new Property();
-  galleryImages = [
-    { image: 'assets/images/house_1-detail-1.jpg' },
-    { image: 'assets/images/house_1-detail-2.jpg' },
-    { image: 'assets/images/house_1-detail-3.jpg' },
-    { image: 'assets/images/house_1-detail-4.jpg' }
-  ];
+  galleryImages?: any;
 
   constructor(private route: ActivatedRoute, private router: Router,
     private housingService: HousingService) {}
@@ -28,8 +23,22 @@ export class PropertyDetailComponent implements OnInit {
     this.route.data.subscribe(
       (data) => {
         this.property = data['prp'];
+        console.log(this.property?.photos);
       }
     );
+
+    this.property!.age = this.housingService.getPropertyAge(this.property?.estPossessionOn?.toString()!);
+    this.galleryImages = this.getPropertyPhotos();
+  }
+
+  getPropertyPhotos() {
+    const photoUrls = [];
+    if (this.property?.photos)
+      for (const photo of this.property?.photos) {
+        photoUrls.push({ image: photo?.imageUrl });
+      }
+
+    return photoUrls;
   }
 
 }

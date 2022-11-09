@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using RealtySale.Shared;
+using RealtySale.Shared.Errors;
 
 namespace RealtySale.Api.Middlewares;
 
@@ -24,8 +24,7 @@ public class ExceptionsMiddleware
         }
         catch (Exception ex)
         {
-            ApiError response;
-            HttpStatusCode statusCode = HttpStatusCode.InternalServerError;
+            HttpStatusCode statusCode;
             string message;
 
             var exceptionType = ex.GetType();
@@ -38,18 +37,12 @@ public class ExceptionsMiddleware
             else
             {
                 statusCode = HttpStatusCode.InternalServerError;
-                message = "Some unknown error occoured";
-            }
-
-            if (_env.IsDevelopment())
-            {
-                response = new ApiError((int)statusCode, ex.Message, ex.StackTrace?.ToString());
-            }
-            else
-            {
-                response = new ApiError((int)statusCode, message);
+                message = "Some unknown error occurred";
             }
             
+            ApiError response = _env.IsDevelopment() ? new((int)statusCode, ex.Message, ex.StackTrace) 
+                : new((int)statusCode, message);
+
             _logger.LogError(ex, "Error: {Error}", ex.Message);
             context.Response.StatusCode = (int)statusCode;
             context.Response.ContentType = "application/json";

@@ -1,0 +1,17 @@
+.options-search {
+
+  display: flex;
+
+  input[type='search'] {
+    border-radius: 5px 0 0 5px;
+  }
+
+  button {
+    border: none;
+  }
+
+  .search-close-btn {
+    margin-left: -40px;
+    z-index: 100;
+  }
+}

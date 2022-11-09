@@ -2,13 +2,17 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using RealtySale.Api.Data.IRepositories;
-using RealtySale.Api.Data.Repositories;
 using RealtySale.Api.Extensions;
 using RealtySale.Api.Helpers;
 using RealtySale.Api.Models;
+using RealtySale.Api.Repositories.IRepository;
+using RealtySale.Api.Repositories.Repository;
+using RealtySale.Api.Services.IService;
+using RealtySale.Api.Services.Service;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+ConfigurationManager configuration = builder.Configuration;
+IWebHostEnvironment environment = builder.Environment;
 string? defaultDbConnectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
 
 builder.Services.AddControllers().AddNewtonsoftJson();
@@ -21,9 +25,8 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    var configuration = builder.Configuration;
     var jwtKey = configuration["JwtOptions:Key"];
-    var jwtSecurityKeyKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+    var jwtSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
     
     options.TokenValidationParameters = new()
     {
@@ -32,7 +35,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = configuration["JwtOptions:Issuer"],
         ValidAudience = configuration["JwtOptions:Audience"],
-        IssuerSigningKey = jwtSecurityKeyKey
+        IssuerSigningKey = jwtSecurityKey
     };
 });
 
@@ -43,15 +46,19 @@ builder.Services.AddDbContext<RealtySaleContext>(options => options.UseSqlServer
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddTransient<ITokenService, TokenService>();
+builder.Services.AddTransient<IPhotoService, PhotoService>();
 
 WebApplication app = builder.Build();
 
-app.ConfigureExceptionHandler(app.Environment);
+app.ConfigureExceptionHandler(environment);
 
-app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseCors(x => x.WithOrigins(configuration["BrowserPaths:MainApplication"])
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
 
 app.UseAuthentication();
 app.UseAuthorization();

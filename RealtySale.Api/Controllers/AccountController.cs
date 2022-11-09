@@ -1,60 +1,74 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using RealtySale.Api.Data.IRepositories;
-using RealtySale.Api.DTOs;
-using RealtySale.Api.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using RealtySale.Api.Extensions;
+using RealtySale.Api.Repositories.IRepository;
+using RealtySale.Api.Services.IService;
+using RealtySale.Shared.DTOs;
+using RealtySale.Shared.Errors;
 
 namespace RealtySale.Api.Controllers;
 
 public class AccountController : BaseController
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IConfiguration _configuration;
+    private readonly ITokenService _tokenService;
 
-    public AccountController(IUnitOfWork unitOfWork, IConfiguration configuration)
+    public AccountController(IUnitOfWork unitOfWork, ITokenService tokenService)
     {
         _unitOfWork = unitOfWork;
-        _configuration = configuration;
+        _tokenService = tokenService;
     }
 
     [HttpPost("login")] // /api/account/login
-    public async Task<IActionResult> Login(LoginReqDto loginReq)
+    public async Task<IActionResult> Login(UserDto loginReq)
     {
-        var user = await _unitOfWork.UserRepository.AuthenticateAsync(loginReq.Username, loginReq.Password);
-        if (user is null)
-            return Unauthorized();
+        var result = await _unitOfWork.UserRepository.AuthenticateAsync(loginReq.Username, loginReq.Password);
+        var apiError = new ApiError();
+
+        if (!result.IsSuccess)
+        {
+            apiError.ErrorCode = Unauthorized().StatusCode;
+            apiError.ErrorMessage = result.Message;
+            apiError.ErrorDetails = "This error appear when provided username or password does not exists";
+            return Unauthorized(apiError);
+        }
+        
+        var user = result.User;
+
+        if (user is null) return Unauthorized(result.Message);
+        
         var response = new LoginResDto();
         response.Username = user.Username;
-        response.Token = GenerateJwtToken(user);
+        response.Token = _tokenService.GenerateToken(user);
         return Ok(response);
     }
 
-    private string GenerateJwtToken(User user)
+    [HttpPost("register")] // /api/account/register
+    public async Task<IActionResult> Register(UserDto loginReq)
     {
-        var key = _configuration["JwtOptions:Key"];
-        var jwtKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
-        var claims = new List<Claim>
+        var error = new ApiError();
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistsAsync(loginReq.Username);
+        if (isUserExist.IsSuccess)
         {
-            new(ClaimTypes.Name, user.Username),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString())
-        };
-
-        var signingCredentials = new SigningCredentials(jwtKey, SecurityAlgorithms.HmacSha256Signature);
-
-        var tokenDescriptor = new SecurityTokenDescriptor
+            error.ErrorCode = BadRequest().StatusCode;
+            error.ErrorMessage = isUserExist.Message;
+            return BadRequest(error);
+        }
+        
+        if (loginReq.Username.IsEmpty() || loginReq.Password.IsEmpty())
         {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(1),
-            SigningCredentials = signingCredentials,
-            Issuer = _configuration["JwtOptions:Issuer"],
-            Audience = _configuration["JwtOptions:Audience"]
-        };
+            error.ErrorCode = BadRequest().StatusCode;
+            error.ErrorMessage = "Username or Password can not be blank";
+            return BadRequest(error);
+        }
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        var result = await _unitOfWork.UserRepository.RegisterAsync(loginReq.Username, loginReq.Password);
+
+        if (result.IsSuccess)
+        {
+            await _unitOfWork.SaveAsync();
+            return StatusCode(201);
+        }
+
+        return BadRequest(error);
     }
 }

@@ -1,7 +1,9 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TabsetComponent } from 'ngx-bootstrap/tabs';
+import { IKeyValuePair } from 'src/app/models/IKeyValuePair.interface';
 import { IPropertyBase } from 'src/app/models/iPropertyBase.interface';
 import { Property } from 'src/app/models/Property';
 import { AlertifyService } from 'src/app/services/alertify.service';
@@ -19,26 +21,25 @@ export class AddPropertyComponent implements OnInit {
   addPropertyForm?: FormGroup;
   nextClicked?: boolean;
 
-  bhkTypesByLength: Array<string> = ['1', '2', '3', '4'];
-  propertyTypes: Array<string> = ['House', 'Apartment', 'Duplex'];
-  furnishTypes: Array<string> = ['Fully', 'Semi', 'Unfurnished'];
   whereCanMove: Array<string> = ['East', 'West', 'South', 'North'];
-  agreement: Array<string> = ['Yes', 'No'];
   property = new Property();
+
+  propertyTypes?: IKeyValuePair[];
+  furnishTypes?: IKeyValuePair[];
   cityList?: any[];
 
 
   propertyView: IPropertyBase = {
-    Id: null,
-    Name: '',
-    Price: null,
-    SellRent: 0,
-    PType: '',
-    FType: '',
-    BHK: null,
-    BuiltArea: null,
-    City: '',
-    RTM: 0
+    id: null,
+    name: '',
+    price: null,
+    sellRent: 0,
+    propertyType: '',
+    furnishingType: '',
+    bhk: null,
+    builtArea: null,
+    city: '',
+    readyToMove: null
   };
 
   CreateAddPropertyForm() {
@@ -55,25 +56,25 @@ export class AddPropertyComponent implements OnInit {
       PriceInfo: this.fb.group({
         Price: [null, Validators.required],
         BuiltArea: [null, Validators.required],
-        CarpetArea: [null],
-        Security: [null],
-        Maintenance: [null],
+        CarpetArea: [0],
+        Security: [0],
+        Maintenance: [0],
       }),
 
       AddressInfo: this.fb.group({
-        FloorNo: [null],
-        TotalFloor: [null],
+        FloorNo: [0],
+        TotalFloor: [0],
         Address: [null, Validators.required],
-        LandMark: [null]
+        LandMark: ['']
       }),
 
       OtherInfo: this.fb.group({
         RTM: [null, Validators.required],
-        PossessionOn: [null],
-        AOP: [null],
-        Gated: [null],
-        MainEntrance: [null],
-        Description: [null],
+        PossessionOn: [null, Validators.required],
+        AOP: [],
+        Gated: [false],
+        MainEntrance: [0],
+        Description: [''],
       })
     });
   }
@@ -184,27 +185,46 @@ export class AddPropertyComponent implements OnInit {
 // #endregion
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
-    private housingService: HousingService, private router: Router) { }
+    private housingService: HousingService, private router: Router,
+    private datePipe: DatePipe) { }
 
   ngOnInit() {
-    this.housingService.getAllCities().subscribe(
-      (data) => this.cityList = data
-    );
+    if (!localStorage.getItem('username')) {
+      this.alertify.error('You must be logged in to add a property');
+      this.router.navigate(['/user/login']);
+    }
+
+    this.initData();
     this.CreateAddPropertyForm();
+  }
+
+  initData() {
+    this.housingService.getAllCities().subscribe(
+      data => this.cityList = data
+    );
+
+    this.housingService.getAllPropertyTypes().subscribe(
+      data => this.propertyTypes = data
+    );
+
+    this.housingService.getAllFurnishingTypes().subscribe(
+      data => this.furnishTypes = data
+    );
   }
 
   onSubmit() {
     this.nextClicked = true;
     if (this.allTabsValid()) {
       this.mapProperty();
-      this.housingService.addProperty(this.property);
-      this.alertify.success('Your property listed successfully on website');
+      this.housingService.addProperty(this.property).subscribe(() => {
+        this.alertify.success('Your property listed successfully on website');
 
-      if (this.SellRent?.value === '1'){
-        this.router.navigate(['/rent-property']);
-      } else {
-        this.router.navigate(['/']);
-      }
+        if (this.SellRent?.value === '1'){
+          this.router.navigate(['/rent-property']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      });
     } else {
       this.alertify.error('Please review the form and provide all valid entries');
     }
@@ -241,28 +261,26 @@ export class AddPropertyComponent implements OnInit {
   }
 
   mapProperty(): void {
-    this.property.Id = this.housingService.newPropertyId();
-    this.property.SellRent = +this.SellRent.value;
-    this.property.BHK = this.BHK.value;
-    this.property.PType = this.PType.value;
-    this.property.Name = this.Name.value;
-    this.property.City = this.City.value;
-    this.property.FType = this.FType.value;
-    this.property.Price = this.Price.value;
-    this.property.Security = this.Security.value;
-    this.property.Maintenance = this.Maintenance.value;
-    this.property.BuiltArea = this.BuiltArea.value;
-    this.property.CarpetArea = this.CarpetArea.value;
-    this.property.FloorNo = this.FloorNo.value;
-    this.property.TotalFloor = this.TotalFloor.value;
-    this.property.Address = this.Address.value;
-    this.property.Address2 = this.LandMark.value;
-    this.property.RTM = this.RTM.value;
-    this.property.AOP = this.AOP.value;
-    this.property.Gated = this.Gated.value;
-    this.property.MainEntrance = this.MainEntrance.value;
-    this.property.Possession = this.PossessionOn.value;
-    this.property.Description = this.Description.value;
-    this.property.PostedOn = new Date().toString();
+    this.property.id = this.housingService.newPropertyId();
+    this.property.sellRent = +this.SellRent.value;
+    this.property.bhk = this.BHK.value;
+    this.property.propertyTypeId = this.PType.value;
+    this.property.name = this.Name.value;
+    this.property.cityId = this.City.value;
+    this.property.furnishingTypeId = this.FType.value;
+    this.property.price = this.Price.value;
+    this.property.security = this.Security.value;
+    this.property.maintenance = this.Maintenance.value;
+    this.property.builtArea = this.BuiltArea.value;
+    this.property.carpetArea = this.CarpetArea.value;
+    this.property.floorNo = this.FloorNo.value;
+    this.property.totalFloors = this.TotalFloor.value;
+    this.property.address = this.Address.value;
+    this.property.address2 = this.LandMark.value;
+    this.property.readyToMove = this.RTM.value;
+    this.property.gated = this.Gated.value;
+    this.property.mainEntrance = this.MainEntrance.value;
+    this.property.estPossessionOn = this.datePipe.transform(this.PossessionOn.value, 'MM/dd/yyyy') ?? undefined;
+    this.property.description = this.Description.value;
   }
 }

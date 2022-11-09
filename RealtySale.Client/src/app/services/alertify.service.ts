@@ -6,7 +6,7 @@ import * as alertify from 'alertifyjs';
 })
 export class AlertifyService {
 
-constructor() { }
+  constructor() { }
 
   alertifySettings = alertify.set('notifier','position', 'top-right');
 
@@ -19,7 +19,7 @@ constructor() { }
   }
 
   warning(message: string) {
-    alertify.warning();
+    alertify.warning(message);
   }
 
   message(message: string) {

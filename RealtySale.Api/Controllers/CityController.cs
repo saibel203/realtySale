@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using RealtySale.Api.Data.IRepositories;
-using RealtySale.Api.DTOs;
-using RealtySale.Api.Models;
+using RealtySale.Api.Repositories.IRepository;
+using RealtySale.Shared.Data;
+using RealtySale.Shared.DTOs;
 
 namespace RealtySale.Api.Controllers;
 
-[Authorize]
 public class CityController : BaseController
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -90,7 +88,7 @@ public class CityController : BaseController
 
         if (result.IsSuccess)
         {
-            cityToPatch.ApplyTo((City)result.City!, ModelState);
+            cityToPatch.ApplyTo(result.City!, ModelState);
             await _unitOfWork.SaveAsync();
 
             return Ok(result.City);   

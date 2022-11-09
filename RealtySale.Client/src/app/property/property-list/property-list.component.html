@@ -1,21 +1,39 @@
-<label>Filter City: &nbsp; </label>
-<input [(ngModel)]='City'>
-<button type="button" (click)="onCityFilter()">Search</button>
-<button type="button" (click)="onCityFilterClear()">Clear</button> &nbsp;
+<div class="list-options">
+  <div class="options-search input-group">
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Search by city" />
+      <button type="button" class="btn bg-transparent search-close-btn">
+        <i class="fa fa-times"></i>
+      </button>
+      <button type="button" class="btn btn-primary">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
 
-<label>Sort by &nbsp;</label>
-<select [(ngModel)] = 'SortbyParam'>
-  <option value="City">City</option>
-  <option value="Price">Price</option>
-</select>
-<button type="button" (click)="onSortDirection()">
-  <i *ngIf="SortDirection === 'asc'" class="fas fa-sort-alpha-down"></i>
-  <i *ngIf="SortDirection === 'desc'" class="fas fa-sort-alpha-up"></i>
-</button>
+  </div>
+  <!-- <input [(ngModel)]='City'>
+  <button type="button" (click)="onCityFilter()">Search</button>
+  <button type="button" (click)="onCityFilterClear()">Clear</button> &nbsp; -->
 
-<div class="row">
-  <div *ngFor="let property of properties | filter: SearchCity: 'City' | sort: [SortbyParam, SortDirection]"
-  class="shadow-lg p-3 col-sm-4">
+  <label>Sort by &nbsp;</label>
+  <select [(ngModel)]='SortbyParam'>
+    <option value="city">City</option>
+    <option value="price">Price</option>
+    <option value="bhk">BHK</option>
+    <option value="builtArea">Built area</option>
+    <option value="propertyType">Property type</option>
+    <option value="furnishingType">Furnishing type</option>
+    <option value="postedOn">Added date</option>
+  </select>
+  <button type="button" (click)="onSortDirection()">
+    <i *ngIf="SortDirection === 'asc'" class="fas fa-sort-alpha-down"></i>
+    <i *ngIf="SortDirection === 'desc'" class="fas fa-sort-alpha-up"></i>
+  </button>
+</div>
+
+<div class="row mt-4">
+  <div *ngFor="let property of properties | filter: SearchCity: 'city' |
+    sort: [SortbyParam, SortDirection]" class="shadow-lg p-3 col-sm-4">
     <app-property-card [property]="property"></app-property-card>
   </div>
 </div>

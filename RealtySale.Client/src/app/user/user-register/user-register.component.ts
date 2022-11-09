@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { User } from 'src/app/models/user.interface';
+import { Router } from '@angular/router';
+import { UserForRegister } from 'src/app/models/userForRegister.interface';
 import { AlertifyService } from 'src/app/services/alertify.service';
-import { UserService } from 'src/app/services/user.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { PasswordMatchValidator } from 'src/shared/password-match.validator';
 
 @Component({
@@ -13,10 +14,10 @@ import { PasswordMatchValidator } from 'src/shared/password-match.validator';
 export class UserRegisterComponent implements OnInit {
 
   registerForm?: FormGroup;
-  user?: User;
+  user?: UserForRegister;
   userSubmitted?: boolean;
 
-  constructor(private fb: FormBuilder, private userService: UserService,
+  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService,
     private alertify: AlertifyService) { }
 
   ngOnInit(): void {
@@ -37,21 +38,26 @@ export class UserRegisterComponent implements OnInit {
   onSubmit() {
     this.userSubmitted = true;
     if (this.registerForm?.valid) {
-      this.userService.addUser(this.userData());
-      this.registerForm?.reset();
-      this.userSubmitted = false;
-
-      this.alertify.success('Successfully registered');
-    } else {
-      this.alertify.error('You have some errors');
+      this.authService.registerUser(this.userData()).subscribe(
+        () => {
+          this.onReset();
+          this.alertify.success('Congrats, you are successfully registered');
+          this.router.navigate(['/user/login']);
+        }
+      );
     }
   }
 
-  userData(): User {
+  onReset() {
+    this.userSubmitted = false;
+    this.registerForm?.reset();
+  }
+
+  userData(): UserForRegister {
     return this.user = {
-      userName: this.userName?.value,
+      username: this.userName?.value,
       email: this.email?.value,
-      password: this.password?.value,
+      password: this.password?.value
     };
   }
 

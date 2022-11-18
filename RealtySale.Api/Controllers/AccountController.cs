@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RealtySale.Api.Extensions;
 using RealtySale.Api.Repositories.IRepository;
 using RealtySale.Api.Services.IService;
@@ -16,6 +17,22 @@ public class AccountController : BaseController
     {
         _unitOfWork = unitOfWork;
         _tokenService = tokenService;
+    }
+
+    [HttpGet("user/{username}")] // /api/account/user/{username}
+    public async Task<IActionResult> GetUser(string username)
+    {
+        var result = await _unitOfWork.UserRepository.GetUserDataAsync(username);
+        var error = new ApiError();
+
+        if (!result.IsSuccess)
+        {
+            error.ErrorCode = NotFound().StatusCode;
+            error.ErrorMessage = result.Message;
+            return NotFound(error);
+        }
+
+        return Ok(result.User);
     }
 
     [HttpPost("login")] // /api/account/login
@@ -43,10 +60,10 @@ public class AccountController : BaseController
     }
 
     [HttpPost("register")] // /api/account/register
-    public async Task<IActionResult> Register(UserDto loginReq)
+    public async Task<IActionResult> Register(UserDto registerDto)
     {
         var error = new ApiError();
-        var isUserExist = await _unitOfWork.UserRepository.IsUserExistsAsync(loginReq.Username);
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistsAsync(registerDto.Username);
         if (isUserExist.IsSuccess)
         {
             error.ErrorCode = BadRequest().StatusCode;
@@ -54,14 +71,14 @@ public class AccountController : BaseController
             return BadRequest(error);
         }
         
-        if (loginReq.Username.IsEmpty() || loginReq.Password.IsEmpty())
+        if (registerDto.Username.IsEmpty() || registerDto.Password.IsEmpty())
         {
             error.ErrorCode = BadRequest().StatusCode;
             error.ErrorMessage = "Username or Password can not be blank";
             return BadRequest(error);
         }
 
-        var result = await _unitOfWork.UserRepository.RegisterAsync(loginReq.Username, loginReq.Password);
+        var result = await _unitOfWork.UserRepository.RegisterAsync(registerDto.Username, registerDto.Password, registerDto.Email);
 
         if (result.IsSuccess)
         {
@@ -69,6 +86,30 @@ public class AccountController : BaseController
             return StatusCode(201);
         }
 
+        return BadRequest(error);
+    }
+
+    [Authorize]
+    [HttpPost("ChangePassword")] // /api/account/changePassword
+    public async Task<IActionResult> ChangePassword(UserDto user)
+    {
+        var error = new ApiError();
+        if (user.NewPassword is null)
+        {
+            error.ErrorCode = BadRequest().StatusCode;
+            error.ErrorMessage = "Need enter password";
+            return BadRequest(error);
+        }
+        var result = await _unitOfWork.UserRepository.ChangePasswordAsync(user.Username, user.Password, user.NewPassword);
+    
+        if (result.IsSuccess)
+        {
+            await _unitOfWork.SaveAsync();
+            return StatusCode(200);
+        }
+
+        error.ErrorCode = BadRequest().StatusCode;
+        error.ErrorMessage = result.Message;
         return BadRequest(error);
     }
 }

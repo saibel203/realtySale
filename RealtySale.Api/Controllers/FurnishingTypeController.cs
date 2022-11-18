@@ -20,7 +20,12 @@ public class FurnishingTypeController : BaseController
     public async Task<IActionResult> GetAllFurnishingTypes()
     {
         var furnishingTypes = await _unitOfWork.FurnishingTypeRepository.GetFurnishingTypesAsync();
-        var furnishingTypesDto = _mapper.Map<IEnumerable<KeyValuePairDto>>(furnishingTypes);
-        return Ok(furnishingTypesDto);
+        if (furnishingTypes.IsSuccess)
+        {
+            var furnishingTypesDto = _mapper.Map<IEnumerable<KeyValuePairDto>>(furnishingTypes);
+            return Ok(furnishingTypesDto);
+        }
+
+        return BadRequest();
     }
 }

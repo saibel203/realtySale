@@ -1,17 +1,74 @@
-.options-search {
-
+.list-options {
   display: flex;
+  justify-content: space-between;
 
-  input[type='search'] {
-    border-radius: 5px 0 0 5px;
+  select {
+    max-width: 70%;
+    margin-left: 100px;
   }
 
-  button {
-    border: none;
+  .options-search {
+
+    display: flex;
+
+    input[type='search'] {
+      border-radius: 5px 0 0 5px;
+    }
+
+    button {
+      border: none;
+    }
+
+    .search-close-btn {
+      margin-left: -40px;
+      z-index: 100;
+    }
+  }
+}
+
+.list-pagination {
+  margin-top: 20px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+
+  &__inner ::ng-deep {
+    display: flex;
   }
 
-  .search-close-btn {
-    margin-left: -40px;
-    z-index: 100;
+  a {
+    text-decoration: none;
+  }
+
+  .current {
+    background-color: #0d6efd;
+    color: #fff;
+    transition: all .1s linear;
+
+    &:hover {
+      background-color: #0b5ed7;
+    }
+  }
+
+  span {
+    margin: 10px;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .non-current:hover {
+    background-color: #eee;
+  }
+
+  .pagination-next i, .pagination-previous i {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+  }
+
+
+  .pagination-next:hover, .pagination-previous:hover {
+    background-color: #eee;
   }
 }

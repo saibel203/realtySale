@@ -44,11 +44,11 @@ export class HttpErrorInterceptorService implements HttpInterceptor {
       errorMessage = error.error.message;
     } else {
       // Server side errors
-      if (error.status === 401) {
+      if (error.status === ErrorCode.unauthorised) {
         return error.statusText;
       }
 
-      if (error.error.errorMessage && error.status !== 0) {
+      if (error.error.errorMessage && error.status !== ErrorCode.serverDown) {
         { errorMessage = error.error.errorMessage; }
       }
     }

@@ -17,6 +17,24 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<UserRepositoryResponse> GetUserDataAsync(string username)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+        if (user is null)
+            return new()
+            {
+                Message = "User not Found",
+                IsSuccess = false
+            };
+
+        return new()
+        {
+            Message = "User found successfully",
+            IsSuccess = true,
+            User = user
+        };
+    }
+
     public async Task<UserRepositoryResponse> AuthenticateAsync(string username, string passwordText)
     {
         var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -43,17 +61,20 @@ public class UserRepository : IUserRepository
         };
     }
 
-    public async Task<UserRepositoryResponse> RegisterAsync(string username, string password)
+    public async Task<UserRepositoryResponse> RegisterAsync(string username, string password, string email)
     {
         using var hmac = new HMACSHA512();
         byte[] passwordKey = hmac.Key;
         byte[] passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
 
-        User user = new();
-        user.Username = username;
-        user.Password = passwordHash;
-        user.PasswordKey = passwordKey;
-
+        User user = new()
+        {
+            Username = username,
+            Password = passwordHash,
+            PasswordKey = passwordKey,
+            Email = email
+        };
+        
         await _context.Users.AddAsync(user);
 
         return new()
@@ -78,6 +99,40 @@ public class UserRepository : IUserRepository
         {
             Message = "User does not exist",
             IsSuccess = false
+        };
+    }
+
+    public async Task<UserRepositoryResponse> ChangePasswordAsync(string username, string oldPassword, string newPassword)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+        
+        if (user is null || user.PasswordKey is null)
+            return new()
+            {
+                Message = "Invalid some properties",
+                IsSuccess = false
+            };
+        
+        if (!MatchPasswordHash(oldPassword, user.Password, user.PasswordKey))
+            return new()
+            {
+                Message = "TeST ASD",
+                IsSuccess = false
+            };
+        
+        using var hmac = new HMACSHA512();
+        byte[] passwordKey = hmac.Key;
+        byte[] passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(newPassword));
+
+        user.Password = passwordHash;
+        user.PasswordKey = passwordKey;
+
+        _context.Users.Update(user);
+
+        return new()
+        {
+            Message = "OK",
+            IsSuccess = true
         };
     }
 

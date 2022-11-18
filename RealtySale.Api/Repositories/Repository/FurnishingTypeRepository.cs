@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RealtySale.Api.Models;
 using RealtySale.Api.Repositories.IRepository;
-using RealtySale.Shared.Data;
+using RealtySale.Shared.Responses;
 
 namespace RealtySale.Api.Repositories.Repository;
 
@@ -14,9 +14,14 @@ public class FurnishingTypeRepository : IFurnishingTypeRepository
         _context = context;
     }
     
-    public async Task<IEnumerable<FurnishingType>> GetFurnishingTypesAsync()
+    public async Task<FurnishingTypeRepositoryResponse> GetFurnishingTypesAsync()
     {
         var furnishingTypes = await _context.FurnishingTypes.ToListAsync();
-        return furnishingTypes;
+        return new()
+        {
+            Message = "Furnishing types successfully get",
+            IsSuccess = true,
+            FurnishingTypes = furnishingTypes
+        };
     }
 }

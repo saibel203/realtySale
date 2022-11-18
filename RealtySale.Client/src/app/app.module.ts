@@ -9,6 +9,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { CarouselModule } from 'ngx-bootstrap/carousel';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -27,16 +29,22 @@ import { FilterPipe } from './pipes/filter.pipe';
 import { SortPipe } from './pipes/sort.pipe';
 import { HttpErrorInterceptorService } from './services/httperror-interceptor.service';
 import { DatePipe } from '@angular/common';
+import { UserChangePasswordComponent } from './user/user-change-password/user-change-password.component';
+import { UserProfileComponent } from './user/user-profile/user-profile.component';
 
 const appRoutes: Routes = [
-  {path: '', component: PropertyListComponent},
-  {path: 'rent-property', component: PropertyListComponent},
-  {path: 'add-property', component: AddPropertyComponent},
-  {path: 'property-detail/:id', component: PropertyDetailComponent,
-          resolve: { prp: PropertyDetailResolverService }},
-  {path: 'user/login', component: UserLoginComponent},
-  {path: 'user/register', component: UserRegisterComponent},
-  {path: '**', component: PropertyListComponent}
+  { path: '', component: PropertyListComponent },
+  { path: 'rent-property', component: PropertyListComponent },
+  { path: 'add-property', component: AddPropertyComponent },
+  {
+    path: 'property-detail/:id', component: PropertyDetailComponent,
+    resolve: { prp: PropertyDetailResolverService }
+  },
+  { path: 'user/login', component: UserLoginComponent },
+  { path: 'user/register', component: UserRegisterComponent },
+  { path: 'user/change-password', component: UserChangePasswordComponent },
+  { path: 'user/profile', component: UserProfileComponent },
+  { path: '**', component: PropertyListComponent }
 ];
 
 @NgModule({
@@ -50,7 +58,8 @@ const appRoutes: Routes = [
     UserLoginComponent,
     UserRegisterComponent,
     FilterPipe,
-    SortPipe
+    SortPipe,
+    UserChangePasswordComponent
   ],
   imports: [
     BrowserModule,
@@ -59,12 +68,14 @@ const appRoutes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    NgxPaginationModule,
     RouterModule.forRoot(appRoutes),
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ButtonsModule.forRoot(),
     BsDatepickerModule.forRoot(),
-    CarouselModule.forRoot()
+    CarouselModule.forRoot(),
+    ModalModule.forRoot(),
   ],
   providers: [
     HousingService,

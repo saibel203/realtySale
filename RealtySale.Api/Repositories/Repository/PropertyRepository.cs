@@ -2,6 +2,7 @@
 using RealtySale.Api.Models;
 using RealtySale.Api.Repositories.IRepository;
 using RealtySale.Shared.Data;
+using RealtySale.Shared.Responses;
 
 namespace RealtySale.Api.Repositories.Repository;
 
@@ -14,17 +15,22 @@ public class PropertyRepository : IPropertyRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Property>> GetPropertiesAsync(byte sellRent)
+    public async Task<PropertyRepositoryResponse> GetPropertiesAsync(byte sellRent)
     {
         var properties = await _context.Properties.Where(type => type.SellRent == sellRent)
             .Include(pt => pt.PropertyType)
             .Include(pc => pc.City)
             .Include(pf => pf.FurnishingType)
             .ToListAsync();
-        return properties;
+        return new()
+        {
+            Message = "Properties successfully get",
+            IsSuccess = true,
+            Properties = properties
+        };
     }
 
-    public async Task<Property> GetPropertyDetailsAsync(long id)
+    public async Task<PropertyRepositoryResponse> GetPropertyDetailsAsync(long id)
     {
         var property = await _context.Properties
             .Include(pt => pt.PropertyType)
@@ -33,24 +39,44 @@ public class PropertyRepository : IPropertyRepository
             .Include(pp => pp.Photos)
             .Where(x => x.Id == id)
             .FirstAsync();
-        return property;
+        return new()
+        {
+            Message = "Property get successfully",
+            IsSuccess = true,
+            Property = property
+        };
     }
 
-    public async Task<Property> GetPropertyByIdAsync(long id)
+    public async Task<PropertyRepositoryResponse> GetPropertyByIdAsync(long id)
     {
         var property = await _context.Properties
             .Include(pp => pp.Photos)
             .Where(x => x.Id == id)
             .FirstAsync();
 
-        return property;
+        return new()
+        {
+            Message = "Property get successfully",
+            IsSuccess = true,
+            Property = property
+        };
     }
 
-    public async Task AddPropertyAsync(Property? property)
+    public async Task<PropertyRepositoryResponse> AddPropertyAsync(Property? property)
     {
         if (property is null)
-            throw new NullReferenceException();
-        
+            return new()
+            {
+                Message = "Property has some errors",
+                IsSuccess = false
+            };
+
         await _context.Properties.AddAsync(property);
+        
+        return new()
+        {
+            Message = "Property add success",
+            IsSuccess = true
+        };
     }
 }

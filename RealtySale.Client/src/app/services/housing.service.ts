@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Property } from '../models/Property';
 import { environment } from 'src/environments/environment';
 import { IKeyValuePair } from '../models/IKeyValuePair.interface';
+import { City } from '../models/City';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,21 @@ export class HousingService {
 
   constructor(private http: HttpClient) {}
 
+  /* -----------------------------------------------------------
+                              City
+    -----------------------------------------------------------*/
+
   getAllCities(): Observable<string[]> {
     return this.http.get<string[]>(this.baseUrl + '/city/getAll');
   }
+
+  addNewCity(city: City): Observable<City> {
+    return this.http.post<City>(this.baseUrl + '/city/new', city);
+  }
+
+  /* -----------------------------------------------------------
+                            Property
+    -----------------------------------------------------------*/
 
   getAllPropertyTypes(): Observable<IKeyValuePair[]> {
     return this.http.get<IKeyValuePair[]>(this.baseUrl + '/propertyType/list');
@@ -29,7 +42,7 @@ export class HousingService {
     return this.http.get<Property[]>(this.baseUrl + '/property/list/' + SellRent?.toString());
   }
 
-  getProperty(id: number) {
+  getProperty(id: number) : Observable<Property> {
     return this.http.get<Property>(this.baseUrl + '/property/detail/' + id.toString());
   }
 

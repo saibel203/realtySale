@@ -1,11 +1,12 @@
 ﻿using RealtySale.Shared.Data;
+using RealtySale.Shared.Responses;
 
 namespace RealtySale.Api.Repositories.IRepository;
 
 public interface IPropertyRepository
 {
-    Task<IEnumerable<Property>> GetPropertiesAsync(byte sellRent);
-    Task<Property> GetPropertyDetailsAsync(long id);
-    Task<Property> GetPropertyByIdAsync(long id);
-    Task AddPropertyAsync(Property? property);
+    Task<PropertyRepositoryResponse> GetPropertiesAsync(byte sellRent);
+    Task<PropertyRepositoryResponse> GetPropertyDetailsAsync(long id);
+    Task<PropertyRepositoryResponse> GetPropertyByIdAsync(long id);
+    Task<PropertyRepositoryResponse> AddPropertyAsync(Property? property);
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserForRegister } from 'src/app/models/userForRegister.interface';
+import { UserForRegister } from 'src/app/models/UserForRegister.interface';
 import { AlertifyService } from 'src/app/services/alertify.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { PasswordMatchValidator } from 'src/shared/password-match.validator';

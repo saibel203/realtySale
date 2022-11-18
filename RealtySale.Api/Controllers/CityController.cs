@@ -40,7 +40,7 @@ public class CityController : BaseController
         if (result.IsSuccess)
         {
             await _unitOfWork.SaveAsync();
-            return Ok(result.Message);
+            return StatusCode(201);
         }
 
         return BadRequest(result.Message);

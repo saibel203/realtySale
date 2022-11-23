@@ -1,2 +1,105 @@
-<p>{{ user?.userName }}</p>
-<p>{{ user?.email }}</p>
+<section class="profile-box">
+  <aside>
+    <figure #hoverImageElement class="profile-box__inner-image" (mouseleave)="onImageHover()" (click)="onImageUploadView()">
+      <img *ngIf="userProfile?.userImage === null || userProfile?.userImage === ''" class="profile-box__image"
+        src="http://localhost:7232/Upload/UserImages/DefaultImage.png" alt="Default profile image" />
+      <img *ngIf="userProfile?.userImage !== null && userProfile?.userImage !== ''" class="profile-box__image"
+        src="http://localhost:7232{{ userProfile?.userImage }}" alt="Default profile image" />
+      <figcaption><i class="fa-solid fa-pen-to-square"></i></figcaption>
+      <input #imageUpload type="file" accept=".jpg,.png,.gif" (change)="onImageUpload(imageUpload.files)">
+    </figure>
+    <ul class="profile-box__socials">
+      <li class="profile-box__socials-items">
+        <a href="https://{{ userProfile?.telegramLink }}" target="_blank"><i class="fa-brands fa-telegram"></i></a>
+      </li>
+      <li class="profile-box__socials-items">
+        <a href="https://{{ userProfile?.instagramLink }}" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+      </li>
+      <li class="profile-box__socials-items">
+        <a href="https://{{ userProfile?.facebookLink }}" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+      </li>
+    </ul>
+  </aside>
+
+  <header class="profile-box__header">
+    <h1 class="profile-box__fullname">
+      <span *ngIf="userProfile?.firstName !== null">{{ userProfile?.firstName }} {{ userProfile?.lastName }} </span>
+      <span *ngIf="userProfile?.firstName === null">Name surname </span>
+      <span><a (click)="openModal(changeProfile)"><i class="fa-solid fa-pen-to-square"></i></a></span>
+    </h1>
+
+    <ng-template #changeProfile>
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Change profile data</h4>
+        <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+          <span aria-hidden="true" class="visually-hidden">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form *ngIf="changeUserDataForm" [formGroup]="changeUserDataForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" placeholder="username@gmail.com"
+              formControlName="Email">
+
+            <span class="form-error-block" *ngIf="Email?.invalid && (Email?.touched)">
+              Email field is required
+            </span>
+          </div>
+
+          <div class="input-group mb-3">
+            <span class="input-group-text">First and last name</span>
+            <input type="text" aria-label="First name" class="form-control" formControlName="FirstName">
+            <input type="text" aria-label="Last name" class="form-control" formControlName="LastName">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Telegram link</label>
+            <input type="text" class="form-control" placeholder="t.me/your_username"
+              formControlName="TelegramLink">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Instagram link</label>
+            <input type="text" class="form-control" placeholder="instagram.com/username"
+              formControlName="InstagramLink">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Facebook link</label>
+            <input type="text" class="form-control" placeholder="facebook.com/username"
+              formControlName="FacebookLink">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Phone number</label>
+            <input type="text" class="form-control" placeholder="+38 (096) 152 22 22"
+              formControlName="Phone">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">About you (description)</label>
+            <textarea class="form-control" rows="3" formControlName="Description"></textarea>
+          </div>
+
+          <div class="btn-group">
+            <button [disabled]="changeUserDataForm.invalid" type="submit" class="btn btn-primary">Save changes</button>
+            <button type="reset" class="btn btn-danger">Cancle</button>
+          </div>
+        </form>
+
+      </div>
+    </ng-template>
+
+    <h4 class="profile-box__username">@<span class="username">{{ userProfile?.username }}</span>
+      <span *ngIf="userProfile?.email !== null">
+        |
+        <span class="email">{{ userProfile?.email }}</span>
+      </span>
+    </h4>
+  </header>
+  <main class="profile-box__content">
+    <p *ngIf="userProfile?.description !== null">{{ userProfile?.description }}</p>
+    <p *ngIf="userProfile?.description === null">About user</p>
+  </main>
+</section>

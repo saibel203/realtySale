@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { User } from '../models/User.interface';
 import { UserForChangePassword } from '../models/UserForChangePassword.interface';
 import { UserForLogin } from '../models/UserForLogin.interface';
+import { UserForProfile } from '../models/UserForProfile.interface';
 import { UserForRegister } from '../models/UserForRegister.interface';
 
 @Injectable({
@@ -16,6 +16,12 @@ export class AuthService {
 
   baseUrl = environment.baseApiUrl;
 
+  httpOptions = {
+    headers: new HttpHeaders({
+      Authorization: 'Bearer ' + localStorage.getItem('token')
+    })
+  };
+
   authUser(user: UserForLogin) : Observable<UserForLogin> {
     return this.http.post<UserForLogin>(this.baseUrl + '/account/login', user);
   }
@@ -25,16 +31,22 @@ export class AuthService {
   }
 
   changePassword(user: UserForChangePassword) : Observable<UserForChangePassword> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        Authorization: 'Bearer ' + localStorage.getItem('token')
-      })
-    };
-
-    return this.http.post<UserForChangePassword>(this.baseUrl + '/account/changePassword', user, httpOptions);
+    return this.http.post<UserForChangePassword>(this.baseUrl + '/account/changePassword', user, this.httpOptions);
   }
 
-  getUserData(username: string) : Observable<User> {
-    return this.http.get<User>(this.baseUrl + '/account/user/' + username);
+  getUserData(username: string) : Observable<UserForProfile> {
+    return this.http.get<UserForProfile>(this.baseUrl + '/account/user/' + username);
+  }
+
+  changeUserData(user: UserForProfile, username: string) : Observable<UserForProfile> {
+    return this.http.put<UserForProfile>(this.baseUrl + '/account/profileChange/' + username, user, this.httpOptions);
+  }
+
+  changeUserImage(patchForm: any, username: string) : Observable<UserForProfile> {
+    return this.http.patch<UserForProfile>(this.baseUrl + '/account/profileChangeImage/' + username, patchForm, this.httpOptions);
+  }
+
+  addUserImage(formFile: FormData) {
+    return this.http.post(this.baseUrl + '/account/uploadImage', formFile, this.httpOptions);
   }
 }

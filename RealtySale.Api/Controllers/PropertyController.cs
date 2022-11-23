@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealtySale.Api.Repositories.IRepository;
-using RealtySale.Api.Services.IService;
 using RealtySale.Shared.Data;
 using RealtySale.Shared.DTOs;
 using RealtySale.Shared.Errors;
@@ -13,13 +12,11 @@ public class PropertyController : BaseController
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IPhotoService _photoService;
 
-    public PropertyController(IUnitOfWork unitOfWork, IMapper mapper, IPhotoService photoService)
+    public PropertyController(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _photoService = photoService;
     }
 
     [HttpGet("list/{sellRent}")] // /api/property/list/{sellRent} (0/1)
@@ -72,34 +69,40 @@ public class PropertyController : BaseController
         return BadRequest(error);
     }
 
-    [HttpPost("add/photo/{propId}")] // /api/property/add/photo/{propId}
-    public async Task<IActionResult> AddPropertyPhoto(IFormFile file, int propId)
-    {
-        var result = await _photoService.UploadPhotoAsync(file);
-    
-        if (result.Error is not null)
-            return BadRequest(result.Error.Message);
-    
-        var resultResponse = await _unitOfWork.PropertyRepository.GetPropertyByIdAsync(propId);
+    // [HttpPost("add/photo/{propId}")] // /api/property/add/photo{propId}
+    // public async Task<IActionResult> AddPropertyPhoto(long propId)
+    // {
+    //     return Ok(200);
+    // }
 
-        if (resultResponse.IsSuccess)
-        {
-            var property = resultResponse.Property;
-            var photo = new Photo
-            {
-                PublicId = result.PublicId,
-                ImageUrl = result.SecureUrl.AbsoluteUri
-            };
-    
-            if (property?.Photos?.Count == 0)
-                photo.IsPrimary = true;
-    
-            property?.Photos?.Add(photo);
-            await _unitOfWork.SaveAsync();
-            
-            return StatusCode(201);   
-        }
-
-        return BadRequest();
-    }
+    // [HttpPost("add/photo/{propId}")] // /api/property/add/photo/{propId}
+    // public async Task<IActionResult> AddPropertyPhoto(IFormFile file, int propId)
+    // {
+    //     var result = await _photoService.UploadPhotoAsync(file);
+    //
+    //     if (result.Error is not null)
+    //         return BadRequest(result.Error.Message);
+    //
+    //     var resultResponse = await _unitOfWork.PropertyRepository.GetPropertyByIdAsync(propId);
+    //
+    //     if (resultResponse.IsSuccess)
+    //     {
+    //         var property = resultResponse.Property;
+    //         var photo = new Photo
+    //         {
+    //             PublicId = result.PublicId,
+    //             ImageUrl = result.SecureUrl.AbsoluteUri
+    //         };
+    //
+    //         if (property?.Photos?.Count == 0)
+    //             photo.IsPrimary = true;
+    //
+    //         property?.Photos?.Add(photo);
+    //         await _unitOfWork.SaveAsync();
+    //         
+    //         return StatusCode(201);   
+    //     }
+    //
+    //     return BadRequest();
+    // }
 }

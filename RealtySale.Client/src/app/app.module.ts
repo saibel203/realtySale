@@ -59,7 +59,8 @@ const appRoutes: Routes = [
     UserRegisterComponent,
     FilterPipe,
     SortPipe,
-    UserChangePasswordComponent
+    UserChangePasswordComponent,
+    UserProfileComponent
   ],
   imports: [
     BrowserModule,

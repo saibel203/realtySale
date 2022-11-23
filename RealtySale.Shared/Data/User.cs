@@ -14,6 +14,12 @@ public class User : BaseDataEntity
     public byte[] Password { get; set; } = Array.Empty<byte>();
 
     public byte[]? PasswordKey { get; set; } = Array.Empty<byte>();
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
+    public string? FirstName { get; set; } = string.Empty;
+    public string? LastName { get; set; } = string.Empty;
+    public string? TelegramLink { get; set; } = string.Empty;
+    public string? InstagramLink { get; set; } = string.Empty;
+    public string? FacebookLink { get; set; } = string.Empty;
+    public string? Description { get; set; } = string.Empty;
+    public string? UserImage { get; set; } = string.Empty;
+    public string? Phone { get; set; } = string.Empty;
 }

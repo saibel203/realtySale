@@ -1,40 +1,47 @@
-﻿using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
+﻿using Microsoft.AspNetCore.Mvc;
 using RealtySale.Api.Services.IService;
+using RealtySale.Shared.Data;
+using RealtySale.Shared.Responses;
 
 namespace RealtySale.Api.Services.Service;
 
 public class PhotoService : IPhotoService
 {
-    private readonly Cloudinary _cloudinary;
-    
-    public PhotoService(IConfiguration configuration)
-    {
-        Account account = new(
-            configuration["CloudinarySettings:CloudName"], 
-            configuration["CloudinarySettings:CloudApiKey"], 
-            configuration["CloudinarySettings:CloudApiSecret"]);
+    private readonly IWebHostEnvironment _environment;
 
-        _cloudinary = new Cloudinary(account);
+    public PhotoService(IWebHostEnvironment environment)
+    {
+        _environment = environment;
     }
-    
-    public async Task<ImageUploadResult> UploadPhotoAsync(IFormFile photo)
+
+    public async Task<PhotoServiceResponse> UploadUserPhotoAsync([FromForm] UserImage image)
     {
-        var uploadResult = new ImageUploadResult();
+        var uploadDirectory = _environment.WebRootPath + "\\Upload\\UserImages\\";
+        var imageName = image.ImageName;
+        var imageExtension = Path.GetExtension(image.Image?.FileName);
 
-        if (photo.Length > 0)
+        if (image.Image?.Length > 0)
         {
-            await using var stream = photo.OpenReadStream();
-            
-            var uploadParameters = new ImageUploadParams
-            {
-                File = new FileDescription(photo.FileName, stream),
-                Transformation = new Transformation().Height(500).Width(800)
-            };
+            if (!Directory.Exists(uploadDirectory))
+                Directory.CreateDirectory(uploadDirectory);
 
-            uploadResult = await _cloudinary.UploadAsync(uploadParameters);
+            await using FileStream fileStream = new(uploadDirectory + imageName + imageExtension, FileMode.Create);
+
+            await image.Image.CopyToAsync(fileStream);
+            await fileStream.FlushAsync();
+
+            return new()
+            {
+                Message = "Image upload successfully",
+                IsSuccess = true,
+                ImagePath = @"/Upload/UserImages/" + imageName + imageExtension
+            };
         }
 
-        return uploadResult;
+        return new()
+        {
+            Message = "Fail image upload",
+            IsSuccess = false
+        };
     }
 }

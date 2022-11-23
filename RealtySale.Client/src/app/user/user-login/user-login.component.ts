@@ -25,6 +25,13 @@ export class UserLoginComponent implements OnInit {
         if (user) {
           localStorage.setItem('token', user?.token);
           localStorage.setItem('username', user?.username);
+          localStorage.setItem('imagePath', user?.userImage);
+
+          this.authSerice.getUserData(user?.username).subscribe(
+            (response) => {
+              localStorage.setItem('userData', JSON.stringify(response));
+            }
+          );
           this.alertify.success("Login successfully");
           this.router.navigate(['/']);
         }

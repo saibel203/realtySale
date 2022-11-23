@@ -54,6 +54,7 @@ WebApplication app = builder.Build();
 app.ConfigureExceptionHandler(environment);
 
 app.UseRouting();
+app.UseStaticFiles();
 
 app.UseCors(x => x.WithOrigins(configuration["BrowserPaths:MainApplication"])
     .AllowAnyHeader()

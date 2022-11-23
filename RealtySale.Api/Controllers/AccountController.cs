@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using RealtySale.Api.Extensions;
 using RealtySale.Api.Repositories.IRepository;
 using RealtySale.Api.Services.IService;
+using RealtySale.Shared.Data;
 using RealtySale.Shared.DTOs;
 using RealtySale.Shared.Errors;
 
@@ -12,11 +15,15 @@ public class AccountController : BaseController
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenService _tokenService;
+    private readonly IPhotoService _photoService;
+    private readonly IMapper _mapper;
 
-    public AccountController(IUnitOfWork unitOfWork, ITokenService tokenService)
+    public AccountController(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper, IPhotoService photoService)
     {
         _unitOfWork = unitOfWork;
         _tokenService = tokenService;
+        _mapper = mapper;
+        _photoService = photoService;
     }
 
     [HttpGet("user/{username}")] // /api/account/user/{username}
@@ -50,12 +57,15 @@ public class AccountController : BaseController
         }
         
         var user = result.User;
-
         if (user is null) return Unauthorized(result.Message);
-        
+
         var response = new LoginResDto();
+        
+        var userInfo = await _unitOfWork.UserRepository.GetUserDataAsync(user.Username);
+        
         response.Username = user.Username;
         response.Token = _tokenService.GenerateToken(user);
+        response.UserImage = userInfo.User?.UserImage!;
         return Ok(response);
     }
 
@@ -108,6 +118,62 @@ public class AccountController : BaseController
             return StatusCode(200);
         }
 
+        error.ErrorCode = BadRequest().StatusCode;
+        error.ErrorMessage = result.Message;
+        return BadRequest(error);
+    }
+
+    [Authorize]
+    [HttpPut("ProfileChange/{username}")] // /api/account/profileChange/{username}
+    public async Task<IActionResult> ProfileDataChange(UserUpdateDto userDto, string username)
+    {
+        var result = await _unitOfWork.UserRepository.GetUserDataAsync(username);
+        var error = new ApiError();
+
+        if (result.IsSuccess)
+        {
+            _mapper.Map(userDto, result.User);
+            await _unitOfWork.SaveAsync();
+            return Ok(result.User);
+        }
+        
+        error.ErrorCode = NotFound().StatusCode;
+        error.ErrorMessage = result.Message;
+        
+        return NotFound(error);
+    }
+
+    [Authorize]
+    [HttpPatch("profileChangeImage/{username}")] // /api/account/profileChangeImage/{username}
+    public async Task<IActionResult> ChangeUserImage(string username, [FromBody] JsonPatchDocument<User> user)
+    {
+        var result = await _unitOfWork.UserRepository.GetUserDataAsync(username);
+        var error = new ApiError();
+        
+        if (result.IsSuccess)
+        {
+            user.ApplyTo(result.User!, ModelState);
+            await _unitOfWork.SaveAsync();
+            
+            return StatusCode(201, new{ Message = result.User!.UserImage });
+        }
+
+        error.ErrorCode = NotFound().StatusCode;
+        error.ErrorMessage = result.Message;
+        
+        return NotFound(error);
+    }
+
+    [Authorize]
+    [HttpPost("uploadImage")] // /api/account/uploadImage
+    public async Task<IActionResult> UploadImage([FromForm] UserImage image)
+    {
+        var result = await _photoService.UploadUserPhotoAsync(image);
+        var error = new ApiError();
+
+        if (result.IsSuccess)
+            return StatusCode(201, new { Message = result.ImagePath });
+        
         error.ErrorCode = BadRequest().StatusCode;
         error.ErrorMessage = result.Message;
         return BadRequest(error);

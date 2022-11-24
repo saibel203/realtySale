@@ -12,10 +12,13 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class UserLoginComponent implements OnInit {
 
+  showPassword: boolean = false;
+  typePassword: string = 'password';
+
   constructor(private authSerice: AuthService, private alertify: AlertifyService,
     private router: Router) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   onLogin(loginForm: NgForm) {
     this.authSerice.authUser(loginForm?.value).subscribe(
@@ -37,7 +40,13 @@ export class UserLoginComponent implements OnInit {
         }
       }
     );
+  }
 
+  onPasswordToggle() {
+    this.showPassword = !this.showPassword;
+    if (this.typePassword === 'password')
+      this.typePassword = 'text';
+    else this.typePassword = 'password';
   }
 
 }

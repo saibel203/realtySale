@@ -8,10 +8,17 @@
             <label for="" class="form-label">Username</label>
             <input ngModel name="userName" type="text" required class="form-control">
           </div>
-          <div class="mb-3">
-            <label for="" class="form-label">Password</label>
-            <input ngModel name="password" type="password" required class="form-control">
+
+          <div class="input-group mb-3 password-block">
+            <div class="password-block__inner input-group">
+              <input ngModel required name="password" [type]="typePassword" class="form-control" placeholder="Password">
+              <span (click)="onPasswordToggle()" class="input-group-text">
+                <i [hidden]="!showPassword" class="fa-regular fa-eye" id="togglePassword"></i>
+                <i [hidden]="showPassword" class="fa-regular fa-eye-slash" id="togglePassword"></i>
+              </span>
+            </div>
           </div>
+
           <div class="mb-3">
             <button [disabled]="!loginForm?.valid" class="btn btn-primary form__card-btn">Login</button>
             <button type="reset" class="btn btn-danger">Cancle</button>

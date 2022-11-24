@@ -27,23 +27,31 @@
             </span>
           </div>
 
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" formControlName="password">
-
-            <span *ngIf="!password?.valid && (password?.touched || userSubmitted)" class="form-error-block">
-              <span *ngIf="password?.errors?.['required']">Please provide password</span>
-              <span *ngIf="password?.errors?.['minlength']">
-                Password should not be lesser than 8 characters
+          <div class="input-group mb-3 password-block">
+            <div class="password-block__inner input-group">
+              <input #passwordInput [type]="typePassword" class="form-control" formControlName="password" placeholder="Password">
+              <span (click)="onPasswordToggle()" class="input-group-text">
+                <i [hidden]="!showPassword" class="fa-regular fa-eye" id="togglePassword"></i>
+                <i [hidden]="showPassword" class="fa-regular fa-eye-slash" id="togglePassword"></i>
               </span>
-            </span>
+              <span class="input-group-text" (click)="generateRandomPassword()">
+                <i class="fa-solid fa-shuffle"></i>
+              </span>
+            </div>
+            <div>
+              <span *ngIf="!password?.valid && (password?.touched || userSubmitted)" class="form-error-block">
+                <span *ngIf="password?.errors?.['required']">Please provide password</span>
+                <span *ngIf="password?.errors?.['minlength']">
+                  Password should not be lesser than 8 characters
+                </span>
+              </span>
+            </div>
           </div>
-
           <div class="mb-3">
-            <label for="confirmPassword" class="form-label">Confirm password</label>
-            <input type="password" class="form-control" formControlName="confirmPassword">
-
-            <span *ngIf="!confirmPassword?.valid && (confirmPassword?.touched || userSubmitted)" class="form-error-block">
+            <input [type]="typePassword" class="form-control" formControlName="confirmPassword"
+              placeholder="Confirm password">
+            <span *ngIf="!confirmPassword?.valid && (confirmPassword?.touched || userSubmitted)"
+              class="form-error-block">
               <span *ngIf="confirmPassword?.hasError('required')">Please confirm password</span>
             </span>
             <span *ngIf="passwordMathError" class="form-error-block">

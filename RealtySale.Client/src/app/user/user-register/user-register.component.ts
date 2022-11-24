@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserForRegister } from 'src/app/models/UserForRegister.interface';
@@ -13,9 +13,13 @@ import { PasswordMatchValidator } from 'src/shared/password-match.validator';
 })
 export class UserRegisterComponent implements OnInit {
 
+  @ViewChild('passwordInput', { read: ElementRef, static: false }) passwordInput?: ElementRef;
+
   registerForm?: FormGroup;
   user?: UserForRegister;
   userSubmitted?: boolean;
+  showPassword: boolean = false;
+  typePassword: string = 'password';
 
   constructor(private fb: FormBuilder, private router: Router, private authService: AuthService,
     private alertify: AlertifyService) { }
@@ -59,6 +63,34 @@ export class UserRegisterComponent implements OnInit {
       email: this.email?.value,
       password: this.password?.value
     };
+  }
+
+  onPasswordToggle() {
+    this.showPassword = !this.showPassword;
+    if (this.typePassword === 'password')
+      this.typePassword = 'text';
+    else this.typePassword = 'password';
+  }
+
+  generateRandomPassword() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"$%&/()=?@~`\\.\';:+=^*_-0123456789';
+    let output = this.passwordInput?.nativeElement;
+
+    function randomValue(value: number) {
+      return Math.floor(Math.random() * value);
+    }
+
+    const length = 10;
+    let str = '';
+
+    for (let i = 0; i < length; i++) {
+      let random = randomValue(characters.length);
+      str += characters.charAt(random);
+    }
+
+    output.value = str;
+
+    this.registerForm?.patchValue({ 'password': str });
   }
 
   // ------------------------------------

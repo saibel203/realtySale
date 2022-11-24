@@ -1,0 +1,12 @@
+.password-block {
+  display: flex;
+  flex-direction: column;
+
+  &__inner {
+    display: flex;
+
+    .input-group-text {
+      cursor: pointer;
+    }
+  }
+}

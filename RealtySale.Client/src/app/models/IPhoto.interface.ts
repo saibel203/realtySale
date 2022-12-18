@@ -1,5 +1,5 @@
-export interface Photo {
+export interface IPhoto {
+  id: number;
   imageUrl: string;
-  publicId: string;
   isPrimary: boolean;
 }

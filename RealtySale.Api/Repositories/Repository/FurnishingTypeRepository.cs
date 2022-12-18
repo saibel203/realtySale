@@ -17,6 +17,7 @@ public class FurnishingTypeRepository : IFurnishingTypeRepository
     public async Task<FurnishingTypeRepositoryResponse> GetFurnishingTypesAsync()
     {
         var furnishingTypes = await _context.FurnishingTypes.ToListAsync();
+        
         return new()
         {
             Message = "Furnishing types successfully get",

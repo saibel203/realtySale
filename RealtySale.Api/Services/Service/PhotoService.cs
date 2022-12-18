@@ -44,4 +44,34 @@ public class PhotoService : IPhotoService
             IsSuccess = false
         };
     }
+
+    public async Task<PhotoServiceResponse> UploadPropertyPhotoAsync(IFormFile file)
+    {
+        var uploadDirectory = _environment.WebRootPath + "\\Upload\\PropertyImages\\";
+        var fileName = file.FileName;
+        
+        if (file.Length > 0)
+        {
+            if (!Directory.Exists(uploadDirectory))
+                Directory.CreateDirectory(uploadDirectory);
+
+            await using FileStream stream = new(uploadDirectory + fileName, FileMode.Create);
+            
+            await file.CopyToAsync(stream);
+            await stream.FlushAsync();
+
+            return new()
+            {
+                Message = "Property image upload successfully",
+                IsSuccess = true,
+                ImagePath = @"/Upload/PropertyImages/" + fileName
+            };
+        }
+        
+        return new()
+        {
+            Message = "Fail image upload",
+            IsSuccess = false
+        };
+    }
 }

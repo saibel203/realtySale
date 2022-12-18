@@ -13,6 +13,7 @@ export class NavBarComponent implements OnInit {
   constructor(private alertify: AlertifyService, private router: Router) { }
 
   loggedinUser?: string;
+  username: string = localStorage.getItem('username') as string;
 
   ngOnInit(): void {}
 
@@ -21,13 +22,19 @@ export class NavBarComponent implements OnInit {
     return this.loggedinUser;
   }
 
+  gotoAllPropertiesUser() {
+    this.router.navigate(['/user', 'all-properties', this.username]).then(() => {
+      window.location.reload();
+    });
+  }
+
   onLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     localStorage.removeItem('imagePath');
     localStorage.removeItem('userData');
     this.alertify.success('You are logged out');
-    this.router.navigate(['/']);
+    this.router.navigate(['/']).then(() => window.location.reload());
   }
 
 }

@@ -1,8 +1,8 @@
-﻿using RealtySale.Shared.Data;
+﻿using RealtySale.Shared.Responses;
 
 namespace RealtySale.Api.Repositories.IRepository;
 
 public interface IPropertyTypeRepository
 {
-    Task<IEnumerable<PropertyType>> GetPropertyTypesAsync();
+    Task<PropertyTypeRepositoryResponse> GetPropertyTypesAsync();
 }

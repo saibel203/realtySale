@@ -26,6 +26,7 @@ export class UserProfileComponent implements OnInit {
   changeUserDataForm?: FormGroup;
   userSubmitted?: boolean;
   uploadFile?: File | null;
+  userId?: number;
 
   modalConfig = {
     animated: false
@@ -46,7 +47,8 @@ export class UserProfileComponent implements OnInit {
     this.authService.getUserData(username).subscribe(
       (data: UserForProfile) => {
         this.userProfile = data;
-        this.userProfile.userImage = localStorage.getItem('imagePath')!;
+        this.userId = data.id;
+        this.userProfile!.userImage = localStorage.getItem('imagePath')!;
         localStorage.setItem('userData', JSON.stringify(data));
       }
     );
@@ -83,10 +85,10 @@ export class UserProfileComponent implements OnInit {
   onImageUpload(file: any) {
     let fileToUpload = <File>file[0];
     const formData = new FormData();
-    const randomString = Math.floor(Math.random() * 10);
+    const randomString = Math.floor(Math.random() * 1000);
 
     formData.append('image', fileToUpload);
-    formData.append('imageName', fileToUpload.name.slice(0, 10) + randomString);
+    formData.append('imageName', fileToUpload.name.slice(0, 20) + randomString);
 
     this.authService.addUserImage(formData).subscribe(
       (result: any) => {
@@ -126,6 +128,7 @@ export class UserProfileComponent implements OnInit {
 
   UserData(): UserForProfile {
     return this.userProfile = {
+      id: this.userId!,
       username: localStorage.getItem('username')!,
       email: this.Email?.value,
       firstName: this.FirstName?.value,

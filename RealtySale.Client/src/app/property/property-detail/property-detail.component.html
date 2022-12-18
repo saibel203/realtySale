@@ -2,19 +2,22 @@
   <div class="col-sm-4 p-0">
     <div class="card">
       <div class="card-img-wrapper">
-        <img *ngIf="!property?.image" src="assets/images/default_house_image.png" alt="Property card image" class="card-img-top">
-        <img *ngIf="property?.image" src="assets/images/{{ property?.image }}.jpg" alt="Property card image" class="card-img-top">
+        <img *ngIf="!mainPhotoUrl" src="assets/images/default_house_image.png" alt="Property card default image"
+          class="card-img-top">
+        <img *ngIf="mainPhotoUrl" src="http://localhost:7232{{ mainPhotoUrl }}" alt="Property card image"
+          class="card-img-top">
       </div>
       <div class="card-body">
         <h1 class="card-title">{{ property?.name }}</h1>
         <div><strong>{{ property?.bhk }} BHK {{ property?.propertyType }} @ ${{ property?.price }}</strong></div>
-        <div><strong>in {{ property?.city }}</strong></div> <hr>
+        <div><strong>in {{ property?.city }}</strong></div>
+        <hr>
         <div><strong>Build Area:</strong>
-        {{ property?.builtArea }} Sqft</div>
+          {{ property?.builtArea }} Sqft</div>
         <div><strong>Carpet Area: </strong>
-        {{ property?.carpetArea }} Sqft</div>
+          {{ property?.carpetArea }} Sqft</div>
         <div><strong>Furnishing Type: </strong>
-        {{ property?.furnishingType }}</div>
+          {{ property?.furnishingType }}</div>
         <div><strong>Available for: </strong>
           <span *ngIf="property?.sellRent == 0">Purchase</span>
           <span *ngIf="property?.sellRent == 1">Rent</span>
@@ -22,8 +25,7 @@
       </div>
       <div class="card-footer">
         <div class="btn-group d-flex">
-          <button class="btn btn-primary">Like</button>
-          <button class="btn btn-success">Message</button>
+          <button class="btn btn-success" (click)="openModal(sendEmailMessage)">Message</button>
         </div>
       </div>
     </div>
@@ -62,24 +64,24 @@
               </div>
 
               <div class="heading">
-                  <strong>Gated Community</strong>
-                  <p *ngIf="property?.gated">Yes</p>
-                  <p *ngIf="!property?.gated">No</p>
+                <strong>Gated Community</strong>
+                <p *ngIf="property?.gated">Yes</p>
+                <p *ngIf="!property?.gated">No</p>
               </div>
 
               <div class="heading">
-                  <strong>Security Deposit</strong>
-                  <p>{{property?.security}}</p>
+                <strong>Security Deposit</strong>
+                <p>{{property?.security}}</p>
               </div>
               <div class="heading">
-                  <strong>Maintenance</strong>
-                  <p>{{property?.maintenance}}</p>
+                <strong>Maintenance</strong>
+                <p>{{property?.maintenance}}</p>
               </div>
             </div>
             <div class="col-sm-12">
               <div class="heading">
-                  <strong>About Property</strong>
-                  <p>{{property?.description}}</p>
+                <strong>About Property</strong>
+                <p>{{property?.description}}</p>
               </div>
             </div>
           </div>
@@ -88,22 +90,71 @@
           <div class="col-sm-12">
             <h1>Address</h1>
             <div class="heading">
-                <strong>{{property?.address}}</strong><br/>
-                <strong>{{property?.address2}}</strong><br/>
-                <strong>{{property?.city}}</strong>
+              <strong>{{property?.address}}</strong><br />
+              <strong>{{property?.address2}}</strong><br />
+              <strong>{{property?.city}}</strong>
             </div>
           </div>
         </tab>
         <tab heading="Photos">
-            <h1>Photos</h1>
-            <carousel [isAnimated]="true" class="property_gallery">
-              <slide *ngFor="let slide of galleryImages">
-                <img [src]="slide?.image" alt="Gallery image" class="gallery__image">
+          <h1>Photos</h1>
+          <div class="photo">
+            <carousel class="photo-carousel" [noPause]="isSliderWrap" [isAnimated]="isSliderAnimate"
+              [interval]="intervalTime" [noPause]="noHoverWrap">
+              <slide *ngFor="let slide of slidesImages">
+                <img src="http://localhost:7232{{ slide?.image }}" alt="Property image">
               </slide>
             </carousel>
+          </div>
+        </tab>
+        <tab heading="Upload/Edit Photos">
+          <app-photo-editor [property]="property"
+            (mainPhotoChangedEvent)="changePrimaryPhoto($event)"></app-photo-editor>
         </tab>
         <tab heading="Contact"></tab>
       </tabset>
     </div>
   </div>
 </div>
+
+<ng-template #sendEmailMessage>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Write an email to the owner</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form *ngIf="sendEmailListForm" [formGroup]="sendEmailListForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label class="form-label">Subject</label>
+        <input type="text" class="form-control" formControlName="Subject">
+
+        <span *ngIf="!Subject?.valid && Subject?.touched" class="form-error-block">
+          <span *ngIf="Subject?.hasError('required')">Subject field is required</span>
+          <span *ngIf="Subject?.hasError('minlength')">Subject field should not be lesser than 5 characters</span>
+          <span *ngIf="Subject?.hasError('maxlength')">Subject field Password should not be greater than 150
+            characters</span>
+
+        </span>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Content</label>
+        <textarea class="form-control" rows="3" formControlName="Content"></textarea>
+
+        <span *ngIf="!Content?.valid && Content?.touched" class="form-error-block">
+          <span *ngIf="Content?.hasError('required')">Content field is required</span>
+          <span *ngIf="Content?.hasError('minlength')">Content field should not be lesser than 10 characters</span>
+          <span *ngIf="Content?.hasError('maxlength')">Content field Password should not be greater than 1000
+            characters</span>
+        </span>
+      </div>
+
+      <div class="btn-group">
+        <button [disabled]="sendEmailListForm.invalid" type="submit" class="btn btn-primary">Send mail</button>
+        <button type="reset" class="btn btn-danger">Cancle</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

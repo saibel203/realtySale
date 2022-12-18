@@ -4,6 +4,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
@@ -31,6 +32,12 @@ import { HttpErrorInterceptorService } from './services/httperror-interceptor.se
 import { DatePipe } from '@angular/common';
 import { UserChangePasswordComponent } from './user/user-change-password/user-change-password.component';
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
+import { AllPropertiesComponent } from './property/all-properties/all-properties.component';
+import { FavouritesPropertiesComponent } from './property/favourites-properties/favourites-properties.component';
+import { PaginationComponent } from './components/pagination/pagination.component';
+import { SearchSettingsComponent } from './components/search-settings/search-settings.component';
+import { FooterComponent } from './footer/footer.component';
+import { PhotoEditorComponent } from './property/photo-editor/photo-editor.component';
 
 const appRoutes: Routes = [
   { path: '', component: PropertyListComponent },
@@ -44,6 +51,8 @@ const appRoutes: Routes = [
   { path: 'user/register', component: UserRegisterComponent },
   { path: 'user/change-password', component: UserChangePasswordComponent },
   { path: 'user/profile', component: UserProfileComponent },
+  { path: 'user/favourites', component: FavouritesPropertiesComponent },
+  { path: 'user/all-properties/:username', component: AllPropertiesComponent },
   { path: '**', component: PropertyListComponent }
 ];
 
@@ -60,7 +69,13 @@ const appRoutes: Routes = [
     FilterPipe,
     SortPipe,
     UserChangePasswordComponent,
-    UserProfileComponent
+    UserProfileComponent,
+    AllPropertiesComponent,
+    FavouritesPropertiesComponent,
+    PaginationComponent,
+    SearchSettingsComponent,
+    FooterComponent,
+    PhotoEditorComponent
   ],
   imports: [
     BrowserModule,

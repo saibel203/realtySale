@@ -1,4 +1,4 @@
-import { Photo } from "./IPhoto.interface";
+import { IPhoto } from "./IPhoto.interface";
 import { IPropertyBase } from "./IPropertyBase.interface";
 
 export class Property implements IPropertyBase {
@@ -28,6 +28,7 @@ export class Property implements IPropertyBase {
   image?: string;
   estPossessionOn?: string;
   description?: string;
-  photos?: Photo[];
+  photos?: IPhoto[];
   postedOn?: string;
+  postedBy!: number;
 }

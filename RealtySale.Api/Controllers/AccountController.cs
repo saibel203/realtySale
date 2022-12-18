@@ -16,20 +16,38 @@ public class AccountController : BaseController
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenService _tokenService;
     private readonly IPhotoService _photoService;
+    private readonly IMailService _mailService;
     private readonly IMapper _mapper;
 
-    public AccountController(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper, IPhotoService photoService)
+    public AccountController(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper, IPhotoService photoService, IMailService mailService)
     {
         _unitOfWork = unitOfWork;
         _tokenService = tokenService;
         _mapper = mapper;
         _photoService = photoService;
+        _mailService = mailService;
     }
 
     [HttpGet("user/{username}")] // /api/account/user/{username}
-    public async Task<IActionResult> GetUser(string username)
+    public async Task<IActionResult> GetUserByUsername(string username)
     {
         var result = await _unitOfWork.UserRepository.GetUserDataAsync(username);
+        var error = new ApiError();
+
+        if (!result.IsSuccess)
+        {
+            error.ErrorCode = NotFound().StatusCode;
+            error.ErrorMessage = result.Message;
+            return NotFound(error);
+        }
+
+        return Ok(result.User);
+    }
+
+    [HttpGet("user/{id:int}")] // /api/account/user/{id}
+    public async Task<IActionResult> GetUserById(long id)
+    {
+        var result = await _unitOfWork.UserRepository.GetUserDataAsync(id);
         var error = new ApiError();
 
         if (!result.IsSuccess)
@@ -177,5 +195,64 @@ public class AccountController : BaseController
         error.ErrorCode = BadRequest().StatusCode;
         error.ErrorMessage = result.Message;
         return BadRequest(error);
+    }
+
+    [Authorize]
+    [HttpPost("addToFavourite/{propertyId}")] // /api/account/addToFavourite/{propertyId}
+    public async Task<IActionResult> AddToFavouriteList(UsernameDto user, int propertyId)
+    {
+        var error = new ApiError();
+        var result = await _unitOfWork.UserRepository.AddFavouritePropertyAsync(user, propertyId);
+
+        if (result.IsSuccess)
+        {
+            await _unitOfWork.SaveAsync();
+            return StatusCode(201, new { ResultMessage = result.Message });
+        }
+
+        error.ErrorCode = NotFound().StatusCode;
+        error.ErrorMessage = result.Message;
+        return NotFound(error);
+    }
+
+    [Authorize]
+    [HttpGet("allFavourites/{username}")] // /api/account/AllFavourites
+    public async Task<IActionResult> GetFavouriteList(string username)
+    {
+        var result = await _unitOfWork.PropertyRepository.GetFavouriteListAsync(username);
+        var error = new ApiError();
+
+        if (result.IsSuccess)
+            return Ok(result.Properties);
+
+        error.ErrorCode = BadRequest().StatusCode;
+        error.ErrorMessage = result.Message;
+
+        return BadRequest(error);
+    }
+
+    [Authorize]
+    [HttpPost("isPropertyFavourite/{propertyId}")] // /api/account/isPropertyFavourite/{propertyId}
+    public async Task<IActionResult> IsPropertyFavourite(UsernameDto user, int propertyId)
+    {
+        var result = await _unitOfWork.UserRepository.IsPropertyFavouriteAsync(user, propertyId);
+        var error = new ApiError();
+
+        if (result.IsSuccess)
+            return StatusCode(201, new { IsFavourite = result.IsPropertyInFavourite });
+
+        error.ErrorCode = NotFound().StatusCode;
+        error.ErrorMessage = result.Message;
+
+        return NotFound(error);
+    }
+
+    [Authorize]
+    [HttpPost("sendEmail")] // /api/account/sendEmail
+    public async Task<IActionResult> SendMessageBuy(EmailBody body)
+    {
+        await _mailService.SendEmailAsync(body);
+
+        return Ok();
     }
 }

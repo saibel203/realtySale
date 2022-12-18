@@ -16,4 +16,6 @@ public class PropertyListDto
     public DateTime EstPossessionOn { get; set; }
     public string Photo { get; set; } = string.Empty;
     public DateTime PostedOn { get; set; } = DateTime.Now;
+    public int PostedBy { get; set; }
+    public string Description { get; set; } = string.Empty;
 }

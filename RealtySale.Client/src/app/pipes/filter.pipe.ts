@@ -43,6 +43,6 @@ export class FilterPipe implements PipeTransform {
       }
     }
 
-    return resultArray;
+    return resultArray.reverse();
   }
 }

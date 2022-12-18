@@ -20,6 +20,7 @@ public class PropertyRepository : IPropertyRepository
         var properties = await _context.Properties.Where(type => type.SellRent == sellRent)
             .Include(pt => pt.PropertyType)
             .Include(pc => pc.City)
+            .Include(pc => pc.Photos)
             .Include(pf => pf.FurnishingType)
             .ToListAsync();
         return new()
@@ -52,7 +53,7 @@ public class PropertyRepository : IPropertyRepository
         var property = await _context.Properties
             .Include(pp => pp.Photos)
             .Where(x => x.Id == id)
-            .FirstAsync();
+            .FirstOrDefaultAsync();
 
         return new()
         {
@@ -77,6 +78,49 @@ public class PropertyRepository : IPropertyRepository
         {
             Message = "Property add success",
             IsSuccess = true
+        };
+    }
+
+    public async Task<PropertyRepositoryResponse> GetUserPropertiesAsync(string username)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+
+        if (user is null)
+            return new()
+            {
+                Message = "User not found",
+                IsSuccess = false
+            };
+
+        var properties = await _context.Properties.Where(x => x.PostedBy == user.Id).ToListAsync();
+
+        return new()
+        {
+            Message = "Successfully get all user properties",
+            IsSuccess = true,
+            Properties = properties
+        };
+    }
+
+    public async Task<PropertyRepositoryResponse> GetFavouriteListAsync(string username)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+
+        if (user is null)
+            return new()
+            {
+                Message = "User not found",
+                IsSuccess = false
+            };
+        
+        var properties = await _context.FavouriteProperties.Include(x => x.User)
+            .Where(x => x.UserId == user.Id).Select(x => x.Property).ToListAsync();
+
+        return new()
+        {
+            Message = "Properties received successfully",
+            IsSuccess = true,
+            Properties = properties!
         };
     }
 }

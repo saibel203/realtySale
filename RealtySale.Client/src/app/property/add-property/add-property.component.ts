@@ -8,7 +8,9 @@ import { City } from 'src/app/models/City';
 import { IKeyValuePair } from 'src/app/models/IKeyValuePair.interface';
 import { IPropertyBase } from 'src/app/models/IPropertyBase.interface';
 import { Property } from 'src/app/models/Property';
+import { UserForProfile } from 'src/app/models/UserForProfile.interface';
 import { AlertifyService } from 'src/app/services/alertify.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { HousingService } from 'src/app/services/housing.service';
 
 @Component({
@@ -33,7 +35,6 @@ export class AddPropertyComponent implements OnInit {
   furnishTypes?: IKeyValuePair[];
   cityList?: Array<any>;
 
-
   propertyView: IPropertyBase = {
     id: null,
     name: '',
@@ -44,8 +45,23 @@ export class AddPropertyComponent implements OnInit {
     bhk: null,
     builtArea: null,
     city: '',
-    readyToMove: null
+    readyToMove: null,
   };
+
+  constructor(private fb: FormBuilder, private alertify: AlertifyService,
+    private housingService: HousingService, private router: Router,
+    private datePipe: DatePipe, private modalService: BsModalService) { }
+
+  ngOnInit() {
+    if (!localStorage.getItem('username')) {
+      this.alertify.error('You must be logged in to add a property');
+      this.router.navigate(['/user/login']);
+    }
+
+    this.initData();
+    this.CreateAddPropertyForm();
+    this.CreateAddCityForm();
+  }
 
   CreateAddPropertyForm() {
     this.addPropertyForm = this.fb.group({
@@ -91,21 +107,6 @@ export class AddPropertyComponent implements OnInit {
     });
   }
 
-  constructor(private fb: FormBuilder, private alertify: AlertifyService,
-    private housingService: HousingService, private router: Router,
-    private datePipe: DatePipe, private modalService: BsModalService) { }
-
-  ngOnInit() {
-    if (!localStorage.getItem('username')) {
-      this.alertify.error('You must be logged in to add a property');
-      this.router.navigate(['/user/login']);
-    }
-
-    this.initData();
-    this.CreateAddPropertyForm();
-    this.CreateAddCityForm();
-  }
-
   initData() {
     this.housingService.getAllCities().subscribe(
       data => this.cityList = data
@@ -127,7 +128,7 @@ export class AddPropertyComponent implements OnInit {
       this.housingService.addProperty(this.property).subscribe(() => {
         this.alertify.success('Your property listed successfully on website');
 
-        if (this.SellRent?.value === '1'){
+        if (this.SellRent?.value === '1') {
           this.router.navigate(['/rent-property']);
         } else {
           this.router.navigate(['/']);
@@ -210,7 +211,7 @@ export class AddPropertyComponent implements OnInit {
     this.modalRef = this.modalService.show(template);
   }
 
-// #region <Getter Methods>
+  // #region <Getter Methods>
   // #region <FormGroups>
   get BasicInfo() {
     return this.addPropertyForm?.controls?.['BasicInfo'] as FormGroup;
@@ -321,5 +322,5 @@ export class AddPropertyComponent implements OnInit {
     return this.addCityForm?.controls?.['Country'] as FormControl;
   }
   // #endregion
-// #endregion
+  // #endregion
 }

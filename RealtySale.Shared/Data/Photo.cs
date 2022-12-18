@@ -6,9 +6,6 @@ namespace RealtySale.Shared.Data;
 [Table("Photos")]
 public class Photo : BaseDataEntity
 {
-    [Required] 
-    public string PublicId { get; set; } = string.Empty;
-    
     [Required]
     public string ImageUrl { get; set; } = string.Empty;
     public bool IsPrimary { get; set; }

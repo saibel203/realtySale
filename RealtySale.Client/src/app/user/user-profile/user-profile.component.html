@@ -1,6 +1,7 @@
 <section class="profile-box">
   <aside>
-    <figure #hoverImageElement class="profile-box__inner-image" (mouseleave)="onImageHover()" (click)="onImageUploadView()">
+    <figure #hoverImageElement class="profile-box__inner-image" (mouseleave)="onImageHover()"
+      (click)="onImageUploadView()">
       <img *ngIf="userProfile?.userImage === null || userProfile?.userImage === ''" class="profile-box__image"
         src="http://localhost:7232/Upload/UserImages/DefaultImage.png" alt="Default profile image" />
       <img *ngIf="userProfile?.userImage !== null && userProfile?.userImage !== ''" class="profile-box__image"
@@ -39,8 +40,7 @@
         <form *ngIf="changeUserDataForm" [formGroup]="changeUserDataForm" (ngSubmit)="onSubmit()">
           <div class="mb-3">
             <label class="form-label">Email</label>
-            <input type="email" class="form-control" placeholder="username@gmail.com"
-              formControlName="Email">
+            <input type="email" class="form-control" placeholder="username@gmail.com" formControlName="Email">
 
             <span class="form-error-block" *ngIf="Email?.invalid && (Email?.touched)">
               Email field is required
@@ -55,8 +55,7 @@
 
           <div class="mb-3">
             <label class="form-label">Telegram link</label>
-            <input type="text" class="form-control" placeholder="t.me/your_username"
-              formControlName="TelegramLink">
+            <input type="text" class="form-control" placeholder="t.me/your_username" formControlName="TelegramLink">
           </div>
 
           <div class="mb-3">
@@ -67,14 +66,12 @@
 
           <div class="mb-3">
             <label class="form-label">Facebook link</label>
-            <input type="text" class="form-control" placeholder="facebook.com/username"
-              formControlName="FacebookLink">
+            <input type="text" class="form-control" placeholder="facebook.com/username" formControlName="FacebookLink">
           </div>
 
           <div class="mb-3">
             <label class="form-label">Phone number</label>
-            <input type="text" class="form-control" placeholder="+38 (096) 152 22 22"
-              formControlName="Phone">
+            <input type="text" class="form-control" placeholder="+38 (096) 152 22 22" formControlName="Phone">
           </div>
 
           <div class="mb-3">

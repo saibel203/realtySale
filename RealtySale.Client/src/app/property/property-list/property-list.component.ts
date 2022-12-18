@@ -2,6 +2,7 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { IPropertyBase } from 'src/app/models/IPropertyBase.interface';
+import { AuthService } from 'src/app/services/auth.service';
 import { HousingService } from 'src/app/services/housing.service';
 
 @Component({
@@ -11,7 +12,7 @@ import { HousingService } from 'src/app/services/housing.service';
 })
 export class PropertyListComponent implements OnInit {
   constructor(private route: ActivatedRoute, private housingService: HousingService,
-    private modalService: BsModalService) { }
+    private modalService: BsModalService, private authService: AuthService) { }
 
   modalRef?: BsModalRef;
 
@@ -51,7 +52,7 @@ export class PropertyListComponent implements OnInit {
 
   getList(): void {
     this.housingService.getAllHouseProperties(this.SellRent).subscribe(
-      data => {
+      (data: IPropertyBase[]) => {
         this.properties = data;
       }
     );
@@ -89,7 +90,7 @@ export class PropertyListComponent implements OnInit {
 
     this.pageSize = 6;
     this.page = 1;
-}
+  }
 
   onSortDirection() {
     if (this.SortDirection === 'desc') {

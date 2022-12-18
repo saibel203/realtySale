@@ -5,9 +5,9 @@ namespace RealtySale.Api.Middlewares;
 
 public class ExceptionsMiddleware
 {
-    private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionsMiddleware> _logger;
     private readonly IHostEnvironment _env;
+    private readonly RequestDelegate _next;
 
     public ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddleware> logger, IHostEnvironment env)
     {

@@ -22,4 +22,6 @@ public class User : BaseDataEntity
     public string? Description { get; set; } = string.Empty;
     public string? UserImage { get; set; } = string.Empty;
     public string? Phone { get; set; } = string.Empty;
+
+    public ICollection<UserProperty>? UserProperties { get; set; }
 }

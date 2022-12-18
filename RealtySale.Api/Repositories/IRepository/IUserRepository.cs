@@ -1,4 +1,5 @@
-﻿using RealtySale.Shared.Responses;
+﻿using RealtySale.Shared.DTOs;
+using RealtySale.Shared.Responses;
 
 namespace RealtySale.Api.Repositories.IRepository;
 
@@ -9,4 +10,7 @@ public interface IUserRepository
     Task<UserRepositoryResponse> IsUserExistsAsync(string username);
     Task<UserRepositoryResponse> ChangePasswordAsync(string username, string oldPassword, string newPassword);
     Task<UserRepositoryResponse> GetUserDataAsync(string username);
+    Task<UserRepositoryResponse> GetUserDataAsync(long id);
+    Task<UserRepositoryResponse> AddFavouritePropertyAsync(UsernameDto user, int id);
+    Task<UserRepositoryResponse> IsPropertyFavouriteAsync(UsernameDto user, int id);
 }

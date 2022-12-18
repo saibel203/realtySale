@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RealtySale.Api.Models;
 using RealtySale.Api.Repositories.IRepository;
 using RealtySale.Shared.Data;
+using RealtySale.Shared.DTOs;
 using RealtySale.Shared.Responses;
 
 namespace RealtySale.Api.Repositories.Repository;
@@ -20,6 +21,7 @@ public class UserRepository : IUserRepository
     public async Task<UserRepositoryResponse> GetUserDataAsync(string username)
     {
         var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+        
         if (user is null)
             return new()
             {
@@ -27,6 +29,25 @@ public class UserRepository : IUserRepository
                 IsSuccess = false
             };
 
+        return new()
+        {
+            Message = "User found successfully",
+            IsSuccess = true,
+            User = user
+        };
+    }
+
+    public async Task<UserRepositoryResponse> GetUserDataAsync(long id)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+        
+        if (user is null)
+            return new()
+            {
+                Message = "User not Found",
+                IsSuccess = false
+            };
+        
         return new()
         {
             Message = "User found successfully",
@@ -133,6 +154,87 @@ public class UserRepository : IUserRepository
         {
             Message = "OK",
             IsSuccess = true
+        };
+    }
+
+    public async Task<UserRepositoryResponse> AddFavouritePropertyAsync(UsernameDto user, int id)
+    {
+        var property = await _context.Properties.FirstOrDefaultAsync(x => x.Id == id);
+        var currentUserResult = await GetUserDataAsync(user.Username);
+        var currentUser = currentUserResult.User!;
+
+        if (property is null)
+            return new()
+            {
+                Message = "Property not found",
+                IsSuccess = false
+            };
+        
+        if (!currentUserResult.IsSuccess)
+            return new()
+            {
+                Message = "User not found!",
+                IsSuccess = false
+            };
+
+        var isElementContains =  await _context.FavouriteProperties
+            .AnyAsync(el => el.PropertyId == id && el.UserId == currentUser.Id);
+
+        var favourite = new UserProperty
+        {
+            PropertyId = id,
+            UserId = currentUser.Id
+        };
+
+        if (isElementContains)
+        {
+            _context.FavouriteProperties.Remove(favourite);
+
+            return new()
+            {
+                Message = "Property remove from Favourite list successfully",
+                IsSuccess = true
+            };
+        }
+
+        await _context.FavouriteProperties.AddAsync(favourite);
+
+        return new()
+        {
+            Message = "Property add to Favourite list successfully",
+            IsSuccess = true,
+            Favourite = favourite
+        };
+    }
+
+    public async Task<UserRepositoryResponse> IsPropertyFavouriteAsync(UsernameDto user, int id)
+    {
+        var property = await _context.Properties.FirstOrDefaultAsync(x => x.Id == id);
+        var currentUser = await GetUserDataAsync(user.Username);
+
+        if (property is null)
+            return new()
+            {
+                Message = "Property not found",
+                IsSuccess = false
+            };
+
+        if (!currentUser.IsSuccess)
+            return new()
+            {
+                Message = "User not found",
+                IsSuccess = false
+            };
+        
+        var propertiesList = _context.FavouriteProperties.Include(x => x.User)
+            .Where(x => x.UserId == currentUser.User!.Id).Select(x => x.Property).ToListAsync();
+        bool isProperty = propertiesList.Result.Contains(property);
+        
+        return new()
+        {
+            Message = "Property in favourite list: " + isProperty,
+            IsSuccess = true,
+            IsPropertyInFavourite = isProperty
         };
     }
 

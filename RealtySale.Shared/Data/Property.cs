@@ -33,4 +33,6 @@ public class Property : BaseDataEntity
     [ForeignKey("User")]
     public int PostedBy { get; set; }
     public User? User { get; set; }
+
+    public ICollection<UserProperty>? UserProperties { get; set; }
 }

@@ -25,6 +25,11 @@ export class UserRegisterComponent implements OnInit {
     private alertify: AlertifyService) { }
 
   ngOnInit(): void {
+    if (localStorage.getItem('username')) {
+      this.alertify.error('You have already been authenticated');
+      this.router.navigate(['/']);
+    }
+
     this.createRegisterForm();
   }
 

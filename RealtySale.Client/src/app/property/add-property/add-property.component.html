@@ -84,7 +84,8 @@
                   <ng-template #addModal>
                     <div class="modal-header">
                       <h4 class="modal-title pull-left">Add city</h4>
-                      <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+                      <button type="button" class="btn-close close pull-right" aria-label="Close"
+                        (click)="modalRef?.hide()">
                         <span aria-hidden="true" class="visually-hidden">&times;</span>
                       </button>
                     </div>
@@ -96,7 +97,8 @@
 
                           <div class="form-error-block" *ngIf="CityName?.invalid && (nextClicked || CityName?.touched)">
                             <span *ngIf="CityName?.errors?.['required']">Please enter city name. </span>
-                            <span *ngIf="CityName?.errors?.['minlength']">Name must be between 5 and 30 characters. </span>
+                            <span *ngIf="CityName?.errors?.['minlength']">Name must be between 5 and 30 characters.
+                            </span>
                             <span *ngIf="CityName?.errors?.['pattern']">City must contains only letters. </span>
                           </div>
                         </div>
@@ -261,8 +263,14 @@
 
                 <div class="mb-3">
                   <label class="form-label">Description</label>
-                  <textarea type="text" class="form-control" rows="6" formControlName="Description"></textarea>
+                  <textarea type="text" class="form-control" rows="6" formControlName="Description"
+                    #propDescription (keyup)="propertyView.description=propDescription.value"></textarea>
                 </div>
+
+                <!--
+                  <input type="text" class="form-control" #propName (keyup)="propertyView.name=propName.value"
+                    formControlName="Name">
+                 -->
 
                 <div class="mb-3 form-btn-block">
                   <button type="button" class="btn btn-primary btn-block"

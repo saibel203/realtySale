@@ -1,18 +1,30 @@
 .card {
   min-height: 600px;
+
+  img {
+    padding: 15px;
+    height: 250px;
+    border-radius: 20px;
+  }
 }
 
-.card img {
-  padding: 10px;
-  height: 250px;
-}
+.photo {
+  max-width: 50%;
 
-.property_gallery {
-  margin: 30px;
-}
+  ::ng-deep {
 
-.gallery__image {
-  display: block;
-  height: 700px;
-  max-width: auto;
+    .carousel-indicators {
+      display: none;
+    }
+
+    .item {
+      overflow: hidden;
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
 }

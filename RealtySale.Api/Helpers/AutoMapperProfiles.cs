@@ -18,7 +18,9 @@ public class AutoMapperProfiles : Profile
             .ForMember(x => x.City, options => options.MapFrom(src => src.City!.Name))
             .ForMember(x => x.Country, options => options.MapFrom(src => src.City!.Country))
             .ForMember(x => x.PropertyType, options => options.MapFrom(src => src.PropertyType!.Name))
-            .ForMember(x => x.FurnishingType, options => options.MapFrom(src => src.FurnishingType!.Name));
+            .ForMember(x => x.FurnishingType, options => options.MapFrom(src => src.FurnishingType!.Name))
+            .ForMember(x => x.Photo, options => options.MapFrom(src => src.Photos!
+                .FirstOrDefault(p => p.IsPrimary)!.ImageUrl));
         CreateMap<Property, PropertyDetailDto>()
             .ForMember(x => x.City, options => options.MapFrom(src => src.City!.Name))
             .ForMember(x => x.Country, options => options.MapFrom(src => src.City!.Country))
@@ -29,5 +31,6 @@ public class AutoMapperProfiles : Profile
         CreateMap<FurnishingType, KeyValuePairDto>();
         
         CreateMap<User, UserUpdateDto>().ReverseMap();
+        CreateMap<User, UsernameDto>().ReverseMap();
     }
 }

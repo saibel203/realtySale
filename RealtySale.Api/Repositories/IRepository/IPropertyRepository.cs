@@ -9,4 +9,6 @@ public interface IPropertyRepository
     Task<PropertyRepositoryResponse> GetPropertyDetailsAsync(long id);
     Task<PropertyRepositoryResponse> GetPropertyByIdAsync(long id);
     Task<PropertyRepositoryResponse> AddPropertyAsync(Property? property);
+    Task<PropertyRepositoryResponse> GetUserPropertiesAsync(string username);
+    Task<PropertyRepositoryResponse> GetFavouriteListAsync(string username);
 }

@@ -61,14 +61,28 @@
     background-color: #eee;
   }
 
-  .pagination-next i, .pagination-previous i {
+  .pagination-next i,
+  .pagination-previous i {
     display: inline-block;
     width: 100%;
     height: 100%;
   }
 
 
-  .pagination-next:hover, .pagination-previous:hover {
+  .pagination-next:hover,
+  .pagination-previous:hover {
     background-color: #eee;
+  }
+}
+
+.container-cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  &__inner {
+    width: 32%;
+    margin: 10px 2px;
+    border: 1px solid #eee;
   }
 }

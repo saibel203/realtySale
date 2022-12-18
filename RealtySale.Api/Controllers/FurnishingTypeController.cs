@@ -19,9 +19,10 @@ public class FurnishingTypeController : BaseController
     [HttpGet("list")] // /api/furnishingType/list
     public async Task<IActionResult> GetAllFurnishingTypes()
     {
-        var furnishingTypes = await _unitOfWork.FurnishingTypeRepository.GetFurnishingTypesAsync();
-        if (furnishingTypes.IsSuccess)
+        var furnishingTypesResult = await _unitOfWork.FurnishingTypeRepository.GetFurnishingTypesAsync();
+        if (furnishingTypesResult.IsSuccess)
         {
+            var furnishingTypes = furnishingTypesResult.FurnishingTypes;
             var furnishingTypesDto = _mapper.Map<IEnumerable<KeyValuePairDto>>(furnishingTypes);
             return Ok(furnishingTypesDto);
         }

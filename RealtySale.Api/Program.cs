@@ -48,6 +48,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IPhotoService, PhotoService>();
+builder.Services.AddTransient<IMailService, MailService>();
 
 WebApplication app = builder.Build();
 

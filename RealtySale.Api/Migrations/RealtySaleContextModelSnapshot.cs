@@ -96,10 +96,6 @@ namespace RealtySale.Api.Migrations
                     b.Property<int>("PropertyId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PublicId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PropertyId");
@@ -289,6 +285,21 @@ namespace RealtySale.Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("RealtySale.Shared.Data.UserProperty", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PropertyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "PropertyId");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("FavouriteProperties");
+                });
+
             modelBuilder.Entity("RealtySale.Shared.Data.Photo", b =>
                 {
                     b.HasOne("RealtySale.Shared.Data.Property", "Property")
@@ -335,9 +346,35 @@ namespace RealtySale.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("RealtySale.Shared.Data.UserProperty", b =>
+                {
+                    b.HasOne("RealtySale.Shared.Data.Property", "Property")
+                        .WithMany("UserProperties")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RealtySale.Shared.Data.User", "User")
+                        .WithMany("UserProperties")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("RealtySale.Shared.Data.Property", b =>
                 {
                     b.Navigation("Photos");
+
+                    b.Navigation("UserProperties");
+                });
+
+            modelBuilder.Entity("RealtySale.Shared.Data.User", b =>
+                {
+                    b.Navigation("UserProperties");
                 });
 #pragma warning restore 612, 618
         }

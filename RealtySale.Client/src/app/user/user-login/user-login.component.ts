@@ -18,7 +18,12 @@ export class UserLoginComponent implements OnInit {
   constructor(private authSerice: AuthService, private alertify: AlertifyService,
     private router: Router) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    if (localStorage.getItem('username')) {
+      this.alertify.error('You have already been authenticated');
+      this.router.navigate(['/']);
+    }
+  }
 
   onLogin(loginForm: NgForm) {
     this.authSerice.authUser(loginForm?.value).subscribe(
@@ -36,7 +41,7 @@ export class UserLoginComponent implements OnInit {
             }
           );
           this.alertify.success("Login successfully");
-          this.router.navigate(['/']);
+          this.router.navigate(['/']).then(() => window.location.reload());
         }
       }
     );

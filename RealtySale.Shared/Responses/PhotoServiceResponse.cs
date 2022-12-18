@@ -1,6 +1,4 @@
-﻿using RealtySale.Shared.Data;
-
-namespace RealtySale.Shared.Responses;
+﻿namespace RealtySale.Shared.Responses;
 
 public class PhotoServiceResponse
 {

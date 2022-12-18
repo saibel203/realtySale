@@ -57,40 +57,36 @@
   </button>
 </div>
 
-<div class="row mt-4">
+<div class="container-cards">
   <div *ngFor="let property of properties |
     filter: [SearchCity, +BhkCount, +MinimumPrice, +MaximumPrice, +MinimumArea, +MaximumArea]:
             ['city', 'bhk', 'price', 'builtArea'] |
-    sort: [SortbyParam, SortDirection] |
-    paginate: { currentPage: page, totalItems: count, itemsPerPage: pageSize }; let i = index"
-    class="shadow-lg p-3 col-sm-4">
+          sort: [SortbyParam, SortDirection] |
+          paginate: { currentPage: page, totalItems: count, itemsPerPage: pageSize }; let i = index"
+    class="container-cards__inner">
     <app-property-card [property]="property"></app-property-card>
   </div>
-  <div class="list-pagination"  >
-    <!-- <pagination-controls previousLabel="" nextLabel="" class="list-pagination__inner"
-      (pageChange)="onListDataChange($event)"></pagination-controls> -->
+</div>
+<div class="list-pagination" *ngIf="properties?.length! > 6">
+  <pagination-template class="list-pagination__inner" #p="paginationApi" (pageChange)="onListDataChange($event)">
+    <span class="pagination-previous" [class.disabled]="p.isFirstPage()">
+      <a (click)="p.previous()"><i class="fa-solid fa-caret-left"></i></a>
+    </span>
 
-    <pagination-template class="list-pagination__inner" #p="paginationApi"
-    (pageChange)="onListDataChange($event)">
-      <span class="pagination-previous" [class.disabled]="p.isFirstPage()">
-        <a (click)="p.previous()"><i class="fa-solid fa-caret-left"></i></a>
+    <span *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
+      <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value" class="non-current">
+        <span>{{ page.label }}</span>
+      </a>
+      <span *ngIf="p.getCurrent() === page.value">
+        <span>{{ page.label }}</span>
       </span>
+    </span>
 
-      <span *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
-        <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value" class="non-current">
-          <span>{{ page.label }}</span>
-        </a>
-        <span *ngIf="p.getCurrent() === page.value">
-          <span>{{ page.label }}</span>
-        </span>
-      </span>
-
-      <span *ngIf="!p.isLastPage()" class="pagination-next" [class.disabled]="p.isLastPage()">
-        <a (click)="p.next()"><i class="fa-solid fa-caret-right"></i></a>
-      </span>
-      <span *ngIf="p.isLastPage()" class="pagination-next disable-pag" [class.disabled]="p.isLastPage()">
-        <a><i class="fa-solid fa-caret-right"></i></a>
-      </span>
-    </pagination-template>
-  </div>
+    <span *ngIf="!p.isLastPage()" class="pagination-next" [class.disabled]="p.isLastPage()">
+      <a (click)="p.next()"><i class="fa-solid fa-caret-right"></i></a>
+    </span>
+    <span *ngIf="p.isLastPage()" class="pagination-next disable-pag" [class.disabled]="p.isLastPage()">
+      <a><i class="fa-solid fa-caret-right"></i></a>
+    </span>
+  </pagination-template>
 </div>

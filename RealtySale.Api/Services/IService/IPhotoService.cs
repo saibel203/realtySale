@@ -7,4 +7,5 @@ namespace RealtySale.Api.Services.IService;
 public interface IPhotoService
 {
     Task<PhotoServiceResponse> UploadUserPhotoAsync([FromForm] UserImage image);
+    Task<PhotoServiceResponse> UploadPropertyPhotoAsync(IFormFile file);
 }

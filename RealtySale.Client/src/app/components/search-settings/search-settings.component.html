@@ -1,0 +1,58 @@
+<div class="list-options">
+  <button (click)="openModal(filterPanel)" class="btn btn-primary">Open filters settings</button>
+  <button (click)="onCityFilterClear()" type="button" class="btn btn-danger">
+    <i class="fa-solid fa-bucket"></i>
+  </button>
+
+  <ng-template #filterPanel>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Filters settings</h4>
+      <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+        <span aria-hidden="true" class="visually-hidden">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="mb-3">
+        <label class="form-label">City name</label>
+        <input [(ngModel)]="City" type="text" placeholder="City name" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">BHK count</label>
+        <input [(ngModel)]="Bhk" type="text" placeholder="BHK count" class="form-control">
+      </div>
+      <label class="form-label">Min/Max Price</label>
+      <div class="input-group mb-3">
+        <input [(ngModel)]="MinP" type="text" class="form-control" placeholder="Min price">
+        <span class="input-group-text">$</span>
+        <input [(ngModel)]="MaxP" type="text" class="form-control" placeholder="Max price">
+      </div>
+      <label class="form-label">Min/Max Sq Ft</label>
+      <div class="input-group mb-3">
+        <input [(ngModel)]="MinA" type="text" class="form-control" placeholder="Min squaree feet">
+        <span class="input-group-text">Sq Ft</span>
+        <input [(ngModel)]="MaxA" type="text" class="form-control" placeholder="Max squaree feet">
+      </div>
+
+      <!-- <div class="mb-3">
+        <label class="form-label">Change list size</label>
+        <input (input)="onListSizeChange($event)" type="text" placeholder="List size" class="form-control">
+      </div> -->
+      <button (click)="onCityFilter()" class="btn btn-primary">Apply filters</button>
+    </div>
+  </ng-template>
+
+
+  <select [(ngModel)]='SortbyParam' class="form-control">
+    <option value="id">Default (Added date)</option>
+    <option value="city">City</option>
+    <option value="price">Price</option>
+    <option value="bhk">BHK</option>
+    <option value="builtArea">Built area</option>
+    <option value="propertyType">Property type</option>
+    <option value="furnishingType">Furnishing type</option>
+  </select>
+  <button type="button" class="btn btn-outline-secondary" (click)="onSortDirection()">
+    <i *ngIf="SortDirection === 'asc'" class="fa-solid fa-sort-down"></i>
+    <i *ngIf="SortDirection === 'desc'" class="fa-solid fa-sort-up"></i>
+  </button>
+</div>

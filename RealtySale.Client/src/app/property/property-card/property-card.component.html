@@ -1,33 +1,55 @@
-<div class="card">
-  <div class="card-image-wrapper">
-    <img *ngIf="property?.image" src="./assets/images/{{ property?.image }}.jpg" alt="House image" class="property__card-image card-img-top">
-    <img *ngIf="!property?.image" src="./assets/images/default_house_image.png" alt="Default house image" class="property__card-image card-img-top">
-    <ul *ngIf="!hideIcons" class="list-inline text-center card-member-icons animate">
-      <li class="list-inline-item">
-        <button class="btn btn-primary" routerLink="/property-detail/{{ property?.id }}"><i class="far fa-edit"></i></button>
-      </li>
-      <li class="list-inline-item">
-        <button class="btn btn-primary"><i class="far fa-address-book"></i></button>
-      </li>
-    </ul>
+<div class="card-box">
+  <div class="card-box__top">
+    <img *ngIf="property?.photo" src="http://localhost:7232/{{ property?.photo }}" alt="Property image" />
+    <img *ngIf="!property?.photo" src="./assets/images/default_house_image.png" alt="Default property image" />
+
+    <span *ngIf="!hideIcons" class="heart-block" (click)="addToFavourite()" [class.press]="isFavourite">
+      <i class="fas fa-heart heart" [class.press]="isFavourite"></i>
+    </span>
+    <a *ngIf="!hideIcons" routerLink="/property-detail/{{ property?.id }}">View property</a>
   </div>
-  <div class="card-body p-2">
-    <h1 class="mb-0">{{ property?.bhk }} BHK {{ property?.propertyType }} </h1>
-    in {{ property?.name }}<span *ngIf="property?.name">,</span>
-    {{ property?.city }}
+  <div class="card-box__bottom">
+    <h3><span class="card-box__mark">{{ property?.propertyType }}</span> In {{ property?.name }}<span
+        *ngIf="property?.name">,</span> {{ property?.city }}
+    </h3>
+    <p>
+      {{ property?.description | slice:0:100 }}...
+    </p>
+    <div class="advants">
+      <div>
+        <span>BHK</span>
+        <div><i class="fas fa-th-large"></i><span>{{ property?.bhk }}</span></div>
+      </div>
+      <div>
+        <span>Added date</span>
+        <div><i class="fa-regular fa-calendar"></i><span>{{ property?.postedOn | date }}</span></div>
+      </div>
+      <div>
+        <span>Area</span>
+        <div>
+          <i class="fas fa-vector-square"></i><span>{{ property?.builtArea }}<span>Sq Ft</span></span>
+        </div>
+      </div>
+    </div>
 
-    <h6 class="mt-2">{{ property?.furnishingType }}
-      <span *ngIf="property?.furnishingType !== 'Unfurnished'">Furnished</span>
-      <span *ngIf="property?.readyToMove"> | Ready to move</span>
-      <span *ngIf="!property?.readyToMove"> | Possession: {{ property?.estPossessionOn | date }}</span>
-    </h6>
+    <div class="other-info">
+      <div>
+        <span>Author: <a [routerLink]="['/user/all-properties', createdUser?.username]"><span>{{ createdUser?.username
+              }}</span></a></span>
+      </div>
+      <div>
+        <span>Furnishing type: <span>{{ property?.furnishingType }}</span></span>
+      </div>
+      <div>
+        <span *ngIf="property?.readyToMove">Possession: <span class="card-box__mark"> Ready to move</span></span>
+        <span *ngIf="!property?.readyToMove">Possession: <span class="card-box__mark"> {{ property?.estPossessionOn |
+            date }}</span></span>
+      </div>
+    </div>
 
-    <hr class="mt-0 mb-2">
-
-    <p>Added {{ property?.postedOn | date: 'longDate' }}</p>
-    <p>Author </p>
-
-    <h6 class="mb-0">Price: <span class="font-highlight">{{ property?.price }} USD.</span> |
-    Area: <span class="font-highlight">{{ property?.builtArea }} Sq Ft</span></h6>
+    <div class="price">
+      <span>For Sale</span>
+      <span class="card-box__mark">${{ property?.price }}</span>
+    </div>
   </div>
 </div>
